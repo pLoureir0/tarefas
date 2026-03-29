@@ -399,7 +399,7 @@ const PRIORIDADES = {
   media: { label: 'Média', color: '#f4a261' },
   baixa: { label: 'Baixa', color: '#2a9d8f' },
 };
-const CATEGORIAS = ['Pessoal', 'Trabalho', 'Estudos', 'Saúde', 'Outros'];
+const CATEGORIAS = ['Pessoal', 'Trabalho','Casa', 'Estudos', 'Saúde','Lazer', 'Outros'];
 const MESES      = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const DIAS_SEM   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const CAL_ANO    = 2026;
@@ -412,8 +412,8 @@ function loadTasks() {
 function defaultTasks() {
   const now = Date.now();
   return [
-    { id: 1, texto: 'Revisar relatório mensal', categoria: 'Trabalho',  prioridade: 'alta',  concluida: false, criadaEm: now - 1000*60*60*25 },
-    { id: 2, texto: 'Ler 30 minutos',           categoria: 'Estudos',   prioridade: 'media', concluida: false, criadaEm: now - 1000*60*90 },
+    { id: 1, texto: 'Layout SB Vertical', categoria: 'Trabalho',  prioridade: 'alta',  concluida: false, criadaEm: now - 1000*60*60*25 },
+    { id: 2, texto: 'Nova app',           categoria: 'Estudos',   prioridade: 'media', concluida: false, criadaEm: now - 1000*60*90 },
   ];
 }
 function saveTasks() {
