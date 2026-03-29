@@ -1,22 +1,747 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Tarefas</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Tarefas</title>
 
-    <!-- PWA: instalar no ecrã inicial do iPhone -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Tarefas" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
+  <!-- PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tarefas" />
+  <meta name="theme-color" content="#f7f6f3" />
+  <link rel="manifest" href="manifest.json" />
 
-    <!-- PWA geral -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#f7f6f3" />
-  </head>
-  <body style="margin:0">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --border: #f0ece4;
+      --border2: #e8e4dc;
+      --text: #1a1a1a;
+      --muted: #999;
+      --muted2: #bbb;
+      --muted3: #aaa;
+      --accent: #1a1a1a;
+      --tag-bg: #f5f3ef;
+      --filter-active-bg: #f0ede8;
+      --filter-active-border: #d6d0c8;
+      --red: #e63946;
+      --orange: #f4a261;
+      --teal: #2a9d8f;
+      --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+      --font-display: 'DM Serif Display', serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141412;
+        --surface: #1e1e1b;
+        --border: #2a2a26;
+        --border2: #333330;
+        --text: #f0ede8;
+        --muted: #666;
+        --muted2: #555;
+        --muted3: #666;
+        --accent: #f0ede8;
+        --tag-bg: #252520;
+        --filter-active-bg: #2a2a26;
+        --filter-active-border: #444440;
+      }
+    }
+
+    html { touch-action: manipulation; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      padding: 48px 16px calc(env(safe-area-inset-bottom) + 32px);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
+    input, select { font-family: inherit; font-size: 16px; }
+
+    .container { width: 100%; max-width: 520px; }
+
+    /* Header */
+    .header { margin-bottom: 36px; }
+    .header-top { display: flex; align-items: flex-end; justify-content: space-between; }
+    .date-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 0; background: transparent; margin-bottom: 6px;
+      font-size: 12px; color: var(--muted); letter-spacing: 0.08em;
+      text-transform: uppercase; transition: color 0.15s;
+    }
+    .date-btn:hover { color: var(--text); }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 36px; font-weight: 400; color: var(--text); line-height: 1;
+    }
+    .badge {
+      background: var(--accent); color: var(--bg);
+      border-radius: 50%; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 500; font-family: var(--font-display);
+      flex-shrink: 0;
+    }
+    .subtitle { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+    /* Filters */
+    .filters-row { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      background: transparent; color: var(--muted3);
+      border: 1px solid var(--border2); transition: all 0.15s;
+    }
+    .filter-btn.active {
+      background: var(--filter-active-bg); color: var(--text);
+      border-color: var(--filter-active-border);
+    }
+
+    /* Add form */
+    .add-area { margin-bottom: 16px; }
+    .add-buttons { display: flex; gap: 8px; }
+    .btn-add {
+      flex: 1; padding: 13px; border-radius: 12px;
+      border: 1.5px dashed var(--border2);
+      color: var(--muted3); font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-add:hover { background: var(--surface); color: var(--text); border-color: var(--text); }
+    .btn-mic-quick {
+      width: 52px; border-radius: 12px;
+      border: 1.5px dashed var(--border2); color: var(--muted2);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-mic-quick:hover { border-color: var(--text); color: var(--text); }
+
+    .form-card {
+      background: var(--surface); border-radius: 14px; padding: 18px;
+      border: 1.5px solid var(--border2);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      transition: border-color 0.25s, box-shadow 0.25s;
+      margin-bottom: 16px;
+    }
+    .form-card.recording {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(230,57,70,0.07);
+    }
+    .form-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .form-input {
+      flex: 1; border: none; outline: none; font-size: 15px;
+      color: var(--text); background: transparent; padding: 0;
+    }
+    .form-input::placeholder { color: var(--muted2); }
+    .btn-mic {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--tag-bg); color: var(--muted);
+      border: 1.5px solid var(--border2); transition: all 0.2s;
+    }
+    .btn-mic.recording {
+      background: #fff0f1; color: var(--red); border-color: var(--red);
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .recording-status {
+      display: flex; align-items: center; gap: 7px; margin-bottom: 12px;
+      padding: 7px 10px; border-radius: 8px; background: #fff5f5;
+    }
+    .recording-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--red);
+      animation: pulse 1s infinite; flex-shrink: 0;
+    }
+    .recording-text { font-size: 11px; color: var(--red); font-weight: 500; }
+    .error-text { font-size: 12px; color: var(--red); margin-bottom: 10px; }
+    .form-selects { display: flex; gap: 8px; margin-bottom: 14px; }
+    .form-select {
+      flex: 1; padding: 7px 28px 7px 10px; border-radius: 8px;
+      border: 1px solid var(--border2); font-size: 12px; color: var(--muted);
+      background: var(--tag-bg); cursor: pointer; outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .form-actions { display: flex; gap: 8px; }
+    .btn-confirm {
+      flex: 1; padding: 9px; border-radius: 8px;
+      background: var(--accent); color: var(--bg); font-size: 13px; font-weight: 500;
+    }
+    .btn-cancel {
+      padding: 9px 16px; border-radius: 8px;
+      background: var(--filter-active-bg); color: var(--muted); font-size: 13px;
+    }
+
+    /* Calendar popup */
+    .cal-wrap { position: relative; }
+    .cal-popup {
+      position: absolute; top: calc(100% + 8px); left: 0; z-index: 100;
+      background: var(--surface); border-radius: 14px; padding: 16px;
+      border: 1px solid var(--border2); box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      width: 284px;
+    }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .cal-nav { padding: 4px; color: var(--muted); transition: color 0.15s; }
+    .cal-nav:hover { color: var(--text); }
+    .cal-nav:disabled { color: var(--border2); cursor: default; }
+    .cal-month-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-dow { text-align: center; font-size: 10px; color: var(--muted2); font-weight: 600; padding: 2px 0; }
+    .cal-day {
+      padding: 6px 0; border-radius: 7px; font-size: 12px; text-align: center;
+      background: transparent; color: var(--muted3); transition: background 0.15s;
+      position: relative;
+    }
+    .cal-day:hover:not(:disabled) { background: var(--filter-active-bg); }
+    .cal-day.today { background: var(--filter-active-bg); color: var(--text); }
+    .cal-day.selected { background: var(--accent); color: var(--bg); font-weight: 600; }
+    .cal-day.has-done::after {
+      content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%; background: var(--teal);
+    }
+    .cal-day.selected.has-done::after { background: var(--bg); opacity: 0.7; }
+    .cal-day:disabled { color: transparent; cursor: default; }
+    .cal-months { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .cal-months p { margin-bottom: 6px; font-size: 10px; color: var(--muted2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .cal-months-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+    .cal-month-btn {
+      padding: 3px 7px; border-radius: 6px; font-size: 10px; font-weight: 500;
+      background: var(--tag-bg); color: var(--muted3); transition: all 0.15s;
+    }
+    .cal-month-btn.active { background: var(--accent); color: var(--bg); }
+
+    /* Done-day panel (shown inside calendar popup) */
+    .done-panel { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .done-panel-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .done-panel-empty { font-size: 12px; color: var(--muted2); padding: 4px 0; }
+    .done-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid var(--border);
+    }
+    .done-item:last-child { border-bottom: none; }
+    .done-check {
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .done-body { flex: 1; min-width: 0; }
+    .done-text { font-size: 12px; color: var(--text); font-weight: 500; text-decoration: line-through; opacity: 0.6; }
+    .done-meta { font-size: 10px; color: var(--muted2); margin-top: 2px; }
+
+    /* Task list */
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+    .empty { text-align: center; color: var(--muted2); font-size: 13px; padding: 32px 0; }
+
+    .task-item {
+      background: var(--surface); border-radius: 12px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      border: 1px solid var(--border);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .task-item.completing {
+      opacity: 0; transform: translateX(20px);
+    }
+    .task-item:hover .btn-delete { opacity: 1 !important; }
+
+    .btn-check { flex-shrink: 0; padding: 0; line-height: 0; }
+    .task-body { flex: 1; min-width: 0; }
+    .task-text {
+      font-size: 14px; color: var(--text); font-weight: 450;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .task-bottom { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+    .tag {
+      font-size: 10px; background: var(--tag-bg); color: var(--muted);
+      padding: 2px 7px; border-radius: 20px; font-weight: 500;
+    }
+    .priority-tag {
+      font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600;
+    }
+
+    /* Waiting time badge */
+    .wait-badge {
+      margin-left: auto;
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      background: var(--tag-bg); padding: 2px 8px; border-radius: 20px;
+      letter-spacing: 0.02em; white-space: nowrap; flex-shrink: 0;
+    }
+    .wait-badge.long { color: var(--orange); background: rgba(244,162,97,0.12); }
+    .wait-badge.very-long { color: var(--red); background: rgba(230,57,70,0.1); }
+
+    .btn-delete {
+      color: var(--muted2); opacity: 0; padding: 4px;
+      line-height: 0; flex-shrink: 0; transition: opacity 0.15s, color 0.15s;
+    }
+    .btn-delete:hover { color: var(--red); }
+
+    /* Install banner */
+    .install-banner {
+      position: fixed; bottom: calc(env(safe-area-inset-bottom) + 16px);
+      left: 50%; transform: translateX(-50%);
+      background: var(--text); color: var(--bg);
+      border-radius: 14px; padding: 12px 20px;
+      font-size: 13px; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 200;
+      max-width: calc(100vw - 32px); width: 480px;
+    }
+    .install-banner p { flex: 1; line-height: 1.4; }
+    .install-banner strong { font-weight: 600; display: block; }
+    .btn-install { background: var(--bg); color: var(--text); padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .btn-dismiss { color: var(--muted); font-size: 20px; line-height: 1; padding: 0 4px; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    @media (max-width: 480px) {
+      body { padding: 32px 16px calc(env(safe-area-inset-bottom) + 24px); }
+      h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="cal-wrap" id="calWrap">
+        <button class="date-btn" id="dateBtn" onclick="toggleCal()">
+          <span id="dateLabel"></span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <h1>Tarefas</h1>
+        <div id="calPopup" style="display:none" class="cal-popup"></div>
+      </div>
+      <div class="badge" id="badge">0</div>
+    </div>
+    <p class="subtitle" id="subtitle"></p>
+  </div>
+
+  <!-- Category filters -->
+  <div class="filters-row" id="catFilters"></div>
+
+  <!-- Add area -->
+  <div id="addArea">
+    <div class="add-buttons">
+      <button class="btn-add" onclick="openForm()">
+        <span style="font-size:18px;line-height:1;margin-bottom:1px">+</span> Nova tarefa
+      </button>
+      <button class="btn-mic-quick" title="Nova tarefa por voz" onclick="openFormVoice()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/>
+          <path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="9" y1="22" x2="15" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Form (hidden by default) -->
+  <div id="formCard" style="display:none" class="form-card">
+    <div class="form-input-row">
+      <input class="form-input" id="formInput" placeholder="Descreva a tarefa..."
+        onkeydown="formKeydown(event)" />
+      <button class="btn-mic" id="btnMic" onclick="toggleVoice()" title="Gravar por voz">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/>
+          <path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="9" y1="22" x2="15" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div id="recStatus" style="display:none" class="recording-status">
+      <div class="recording-dot"></div>
+      <span class="recording-text">A gravar... toque no microfone para parar</span>
+    </div>
+    <p id="voiceError" class="error-text" style="display:none"></p>
+    <div class="form-selects">
+      <select class="form-select" id="formCat"></select>
+      <select class="form-select" id="formPri"></select>
+    </div>
+    <div class="form-actions">
+      <button class="btn-confirm" onclick="addTask()">Adicionar</button>
+      <button class="btn-cancel" onclick="closeForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Task list -->
+  <div class="task-list" id="taskList"></div>
+</div>
+
+<!-- Install banner (iOS) -->
+<div class="install-banner" id="installBanner" style="display:none">
+  <p>
+    <strong>Instalar no iPhone</strong>
+    Toca em <b>Partilhar</b> → <b>Adicionar ao ecrã inicial</b>
+  </p>
+  <button class="btn-dismiss" onclick="dismissBanner()">×</button>
+</div>
+
+<script>
+const PRIORIDADES = {
+  alta:  { label: 'Alta',  color: '#e63946' },
+  media: { label: 'Média', color: '#f4a261' },
+  baixa: { label: 'Baixa', color: '#2a9d8f' },
+};
+const CATEGORIAS = ['Pessoal', 'Trabalho', 'Estudos', 'Saúde', 'Outros'];
+const MESES      = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEM   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const CAL_ANO    = 2026;
+
+// ── Storage ────────────────────────────────────────────────────────────────
+function loadTasks() {
+  try { return JSON.parse(localStorage.getItem('tarefas')) || defaultTasks(); }
+  catch { return defaultTasks(); }
+}
+function defaultTasks() {
+  const now = Date.now();
+  return [
+    { id: 1, texto: 'Revisar relatório mensal', categoria: 'Trabalho',  prioridade: 'alta',  concluida: false, criadaEm: now - 1000*60*60*25 },
+    { id: 2, texto: 'Ler 30 minutos',           categoria: 'Estudos',   prioridade: 'media', concluida: false, criadaEm: now - 1000*60*90 },
+  ];
+}
+function saveTasks() {
+  localStorage.setItem('tarefas', JSON.stringify(tasks));
+}
+
+let tasks           = loadTasks();
+let filtroCategoria = 'Todas';
+let calMonth        = new Date().getMonth();
+let selectedCalDay  = null;
+
+// ── Time helpers ───────────────────────────────────────────────────────────
+function waitingLabel(criadaEm) {
+  const diff = Date.now() - criadaEm;
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+
+  if (mins < 1)   return 'agora';
+  if (mins < 60)  return `${mins}m`;
+  if (hours < 24) return `${hours}h`;
+
+  const d = days;
+  const h = hours % 24;
+  if (h === 0) return `${d}d`;
+  return `${d}d ${h}h`;
+}
+
+function waitingClass(criadaEm) {
+  const hours = (Date.now() - criadaEm) / 3600000;
+  if (hours >= 48) return 'wait-badge very-long';
+  if (hours >= 12) return 'wait-badge long';
+  return 'wait-badge';
+}
+
+function fmtDateTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' }) +
+    ' · ' + d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+}
+
+function dayKey(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+// ── Voice ──────────────────────────────────────────────────────────────────
+let recording = false;
+let recognition = null;
+
+function toggleVoice() { if (recording) stopVoice(); else startVoice(); }
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showVoiceError('O seu navegador não suporta reconhecimento de voz.'); return; }
+  recognition = new SR();
+  recognition.lang = 'pt-PT'; recognition.continuous = false; recognition.interimResults = true;
+  recognition.onstart  = () => { recording = true; updateMicUI(); };
+  recognition.onresult = e => { document.getElementById('formInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); };
+  recognition.onend    = () => { recording = false; updateMicUI(); };
+  recognition.onerror  = e => {
+    recording = false; updateMicUI();
+    if (e.error === 'not-allowed') showVoiceError('Acesso ao microfone negado.');
+    else if (e.error !== 'no-speech') showVoiceError('Erro no reconhecimento de voz.');
+  };
+  recognition.start();
+}
+function stopVoice() { if (recognition) recognition.stop(); }
+function updateMicUI() {
+  document.getElementById('btnMic').classList.toggle('recording', recording);
+  document.getElementById('recStatus').style.display = recording ? 'flex' : 'none';
+  document.getElementById('formCard').classList.toggle('recording', recording);
+}
+function showVoiceError(msg) {
+  const el = document.getElementById('voiceError');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+// ── Form ───────────────────────────────────────────────────────────────────
+function openForm() {
+  document.getElementById('addArea').style.display = 'none';
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('formInput').value = '';
+  document.getElementById('voiceError').style.display = 'none';
+  document.getElementById('formInput').focus();
+  renderFormSelects();
+}
+function openFormVoice() { openForm(); setTimeout(startVoice, 150); }
+function closeForm() {
+  stopVoice(); recording = false; updateMicUI();
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('addArea').style.display = 'block';
+}
+function formKeydown(e) {
+  if (e.key === 'Enter')  addTask();
+  if (e.key === 'Escape') closeForm();
+}
+function renderFormSelects() {
+  const cat = document.getElementById('formCat');
+  const pri = document.getElementById('formPri');
+  cat.innerHTML = CATEGORIAS.map(c => `<option>${c}</option>`).join('');
+  pri.innerHTML = Object.entries(PRIORIDADES).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('');
+  cat.value = 'Pessoal'; pri.value = 'media';
+}
+function addTask() {
+  const texto = document.getElementById('formInput').value.trim();
+  if (!texto) return;
+  tasks.unshift({
+    id: Date.now(),
+    texto,
+    categoria: document.getElementById('formCat').value,
+    prioridade: document.getElementById('formPri').value,
+    concluida: false,
+    criadaEm: Date.now(),
+    concluidaEm: null,
+  });
+  saveTasks();
+  closeForm();
+  render();
+}
+
+// ── Task actions ───────────────────────────────────────────────────────────
+function completeTask(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (el) {
+    el.classList.add('completing');
+    setTimeout(() => {
+      const t = tasks.find(t => t.id === id);
+      if (t) { t.concluida = true; t.concluidaEm = Date.now(); }
+      saveTasks();
+      render();
+    }, 300);
+  }
+}
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  saveTasks(); render();
+}
+
+// ── SVG icons ──────────────────────────────────────────────────────────────
+function svgCheck(done, small) {
+  const s = small ? 14 : 18;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 18 18" fill="none">
+    <circle cx="9" cy="9" r="8" stroke="${done ? 'var(--teal)' : '#c8c8c8'}" stroke-width="1.5"
+      fill="${done ? 'var(--teal)' : 'transparent'}"/>
+    ${done ? '<polyline points="5,9 8,12 13,6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : ''}
+  </svg>`;
+}
+
+// ── Main render ────────────────────────────────────────────────────────────
+function render() {
+  const pending = tasks.filter(t => !t.concluida);
+
+  // Badge
+  document.getElementById('badge').textContent = pending.length;
+  document.getElementById('subtitle').textContent =
+    pending.length === 0 ? 'Tudo em dia!' :
+    `${pending.length} tarefa${pending.length > 1 ? 's' : ''} pendente${pending.length > 1 ? 's' : ''}`;
+
+  // Date label
+  document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('pt-PT', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  // Category filters — only from pending tasks
+  const catsUsed = [...new Set(pending.map(t => t.categoria))];
+  const allCats  = ['Todas', ...CATEGORIAS.filter(c => catsUsed.includes(c))];
+  if (!allCats.includes(filtroCategoria)) filtroCategoria = 'Todas';
+
+  document.getElementById('catFilters').innerHTML = allCats.map(c =>
+    `<button class="filter-btn${filtroCategoria === c ? ' active' : ''}" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+
+  // Filtered pending
+  const filtered = pending.filter(t =>
+    filtroCategoria === 'Todas' ? true : t.categoria === filtroCategoria
+  );
+
+  const list = document.getElementById('taskList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<p class="empty">Nenhuma tarefa pendente.</p>';
+  } else {
+    list.innerHTML = filtered.map(t => {
+      const p = PRIORIDADES[t.prioridade];
+      const label = waitingLabel(t.criadaEm);
+      const cls   = waitingClass(t.criadaEm);
+      return `<div class="task-item" data-id="${t.id}">
+        <button class="btn-check" onclick="completeTask(${t.id})">${svgCheck(false)}</button>
+        <div class="task-body">
+          <p class="task-text">${escHtml(t.texto)}</p>
+          <div class="task-bottom">
+            <span class="tag">${escHtml(t.categoria)}</span>
+            <span class="priority-tag" style="color:${p.color};background:${p.color}18">${p.label}</span>
+            <span class="${cls}">${label}</span>
+          </div>
+        </div>
+        <button class="btn-delete" onclick="deleteTask(${t.id})">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M2.5 4h10M6 4V2.5h3V4M5.5 4v8h4V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function setCat(c) { filtroCategoria = c; render(); }
+
+// ── Calendar ───────────────────────────────────────────────────────────────
+function toggleCal() {
+  const popup = document.getElementById('calPopup');
+  const visible = popup.style.display !== 'none';
+  popup.style.display = visible ? 'none' : 'block';
+  if (!visible) { selectedCalDay = null; renderCal(); }
+}
+
+function renderCal() {
+  const popup = document.getElementById('calPopup');
+  const hoje  = new Date();
+  const daysInMonth = new Date(CAL_ANO, calMonth + 1, 0).getDate();
+  const firstDay    = new Date(CAL_ANO, calMonth, 1).getDay();
+  const cells = Array(firstDay).fill(null).concat(Array.from({length: daysInMonth}, (_,i) => i+1));
+
+  // Days that have completed tasks
+  const doneDays = new Set(
+    tasks.filter(t => t.concluida && t.concluidaEm).map(t => {
+      const d = new Date(t.concluidaEm);
+      if (d.getFullYear() === CAL_ANO && d.getMonth() === calMonth) return d.getDate();
+      return null;
+    }).filter(Boolean)
+  );
+
+  const isSelected = d => d && selectedCalDay === d;
+  const isToday = d => d && hoje.getFullYear() === CAL_ANO && hoje.getMonth() === calMonth && hoje.getDate() === d;
+
+  const gridCells = cells.map((d, i) => {
+    let cls = 'cal-day';
+    if (isSelected(d)) cls += ' selected';
+    else if (isToday(d)) cls += ' today';
+    if (d && doneDays.has(d)) cls += ' has-done';
+    return `<button class="${cls}" ${!d ? 'disabled' : ''} onclick="selectCalDay(${d})">${d || ''}</button>`;
+  }).join('');
+
+  // Done tasks for selected day
+  let donePanel = '';
+  if (selectedCalDay) {
+    const doneTasks = tasks.filter(t => {
+      if (!t.concluida || !t.concluidaEm) return false;
+      const d = new Date(t.concluidaEm);
+      return d.getFullYear() === CAL_ANO && d.getMonth() === calMonth && d.getDate() === selectedCalDay;
+    });
+
+    const items = doneTasks.length === 0
+      ? `<p class="done-panel-empty">Nenhuma tarefa concluída neste dia.</p>`
+      : doneTasks.map(t => `
+        <div class="done-item">
+          <div class="done-check">${svgCheck(true, true)}</div>
+          <div class="done-body">
+            <p class="done-text">${escHtml(t.texto)}</p>
+            <p class="done-meta">Criada: ${fmtDateTime(t.criadaEm)} · Concluída: ${fmtDateTime(t.concluidaEm)}</p>
+          </div>
+        </div>`).join('');
+
+    donePanel = `<div class="done-panel">
+      <p class="done-panel-title">${selectedCalDay} de ${MESES[calMonth]}</p>
+      ${items}
+    </div>`;
+  }
+
+  popup.innerHTML = `
+    <div class="cal-header">
+      <button class="cal-nav" ${calMonth===0?'disabled':''} onclick="calNav(-1)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="cal-month-title">${MESES[calMonth]} ${CAL_ANO}</span>
+      <button class="cal-nav" ${calMonth===11?'disabled':''} onclick="calNav(1)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="cal-grid">
+      ${DIAS_SEM.map(d => `<div class="cal-dow">${d}</div>`).join('')}
+      ${gridCells}
+    </div>
+    <div class="cal-months">
+      <p>Ir para mês</p>
+      <div class="cal-months-grid">
+        ${MESES.map((m,i) => `<button class="cal-month-btn${calMonth===i?' active':''}" onclick="calGoto(${i})">${m.slice(0,3)}</button>`).join('')}
+      </div>
+    </div>
+    ${donePanel}`;
+}
+
+function calNav(dir) { calMonth = Math.max(0, Math.min(11, calMonth + dir)); selectedCalDay = null; renderCal(); }
+function calGoto(m)  { calMonth = m; selectedCalDay = null; renderCal(); }
+function selectCalDay(d) { selectedCalDay = (selectedCalDay === d) ? null : d; renderCal(); }
+
+// Close cal on outside click
+document.addEventListener('mousedown', e => {
+  const wrap = document.getElementById('calWrap');
+  if (!wrap.contains(e.target)) document.getElementById('calPopup').style.display = 'none';
+});
+
+// ── PWA ────────────────────────────────────────────────────────────────────
+function showInstallBanner() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  const dismissed = localStorage.getItem('installDismissed');
+  if (isIOS && !isStandalone && !dismissed) {
+    document.getElementById('installBanner').style.display = 'flex';
+  }
+}
+function dismissBanner() {
+  localStorage.setItem('installDismissed', '1');
+  document.getElementById('installBanner').style.display = 'none';
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// Auto-refresh waiting times every minute
+setInterval(render, 60000);
+
+// ── Init ───────────────────────────────────────────────────────────────────
+render();
+showInstallBanner();
+</script>
+</body>
 </html>
