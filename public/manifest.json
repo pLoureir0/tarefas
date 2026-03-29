@@ -1,6 +1,6 @@
 {
-  "name": "Tarefas",
-  "short_name": "Tarefas",
+  "name": "PaFazeres",
+  "short_name": "PaFazeres",
   "description": "A minha lista de tarefas pessoal",
   "start_url": "/",
   "display": "standalone",
