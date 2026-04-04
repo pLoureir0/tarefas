@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
@@ -690,7 +690,6 @@ function render() {
       const label = waitingLabel(t.criadaEm);
       const cls   = waitingClass(t.criadaEm);
       return `<div class="task-item" data-id="${t.id}">
-        <button class="btn-check" onclick="completeTask(${t.id})">${svgCheck(false)}</button>
         <div class="task-body">
           <p class="task-text">${escHtml(t.texto)}</p>
           <div class="task-bottom">
