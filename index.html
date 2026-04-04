@@ -223,7 +223,7 @@
     }
     .cal-month-btn.active { background: var(--accent); color: var(--bg); }
 
-    /* Done-day panel (shown inside calendar popup) */
+    /* Done-day panel */
     .done-panel { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
     .done-panel-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
     .done-panel-empty { font-size: 12px; color: var(--muted2); padding: 4px 0; }
@@ -232,9 +232,7 @@
       padding: 6px 0; border-bottom: 1px solid var(--border);
     }
     .done-item:last-child { border-bottom: none; }
-    .done-check {
-      flex-shrink: 0; margin-top: 1px;
-    }
+    .done-check { flex-shrink: 0; margin-top: 1px; }
     .done-body { flex: 1; min-width: 0; }
     .done-text { font-size: 12px; color: var(--text); font-weight: 500; text-decoration: line-through; opacity: 0.6; }
     .done-meta { font-size: 10px; color: var(--muted2); margin-top: 2px; }
@@ -252,7 +250,6 @@
     .task-item.completing {
       opacity: 0; transform: translateX(20px);
     }
-    .task-item:hover .btn-delete { opacity: 1 !important; }
 
     .btn-check { flex-shrink: 0; padding: 0; line-height: 0; }
     .task-body { flex: 1; min-width: 0; }
@@ -280,11 +277,56 @@
     .wait-badge.long { color: var(--orange); background: rgba(244,162,97,0.12); }
     .wait-badge.very-long { color: var(--red); background: rgba(230,57,70,0.1); }
 
+    /* Complete button — sempre visível */
     .btn-delete {
-      color: var(--muted2); opacity: 0; padding: 4px;
-      line-height: 0; flex-shrink: 0; transition: opacity 0.15s, color 0.15s;
+      color: var(--muted2); padding: 4px;
+      line-height: 0; flex-shrink: 0; transition: color 0.15s;
     }
-    .btn-delete:hover { color: var(--red); }
+    .btn-delete:hover { color: var(--teal); }
+
+    /* Popup de confirmação */
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.15s ease;
+    }
+    .confirm-box {
+      background: var(--surface); border-radius: 16px; padding: 24px 20px 20px;
+      width: 100%; max-width: 300px;
+      border: 1px solid var(--border2);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+      animation: slideUp 0.15s ease;
+    }
+    .confirm-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(42,157,143,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .confirm-title {
+      font-size: 15px; font-weight: 600; color: var(--text);
+      text-align: center; margin-bottom: 6px;
+    }
+    .confirm-task-name {
+      font-size: 13px; color: var(--muted);
+      text-align: center; margin-bottom: 20px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .confirm-actions { display: flex; gap: 8px; }
+    .btn-confirm-delete {
+      flex: 1; padding: 10px; border-radius: 10px;
+      background: var(--teal); color: white;
+      font-size: 13px; font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .btn-confirm-delete:hover { opacity: 0.85; }
+    .btn-confirm-cancel {
+      flex: 1; padding: 10px; border-radius: 10px;
+      background: var(--filter-active-bg); color: var(--muted);
+      font-size: 13px; font-weight: 500;
+    }
 
     /* Install banner */
     .install-banner {
@@ -302,6 +344,8 @@
     .btn-dismiss { color: var(--muted); font-size: 20px; line-height: 1; padding: 0 4px; }
 
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes slideUp { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
 
     @media (max-width: 480px) {
       body { padding: 32px 16px calc(env(safe-area-inset-bottom) + 24px); }
@@ -384,6 +428,24 @@
   <div class="task-list" id="taskList"></div>
 </div>
 
+<!-- Popup de confirmação de apagar -->
+<div id="confirmOverlay" class="confirm-overlay" style="display:none" onclick="cancelDelete(event)">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8" stroke="#2a9d8f" stroke-width="1.6" fill="none"/>
+        <polyline points="6,10 9,13 14,7" stroke="#2a9d8f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <p class="confirm-title">Marcar como concluída?</p>
+    <p class="confirm-task-name" id="confirmTaskName"></p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" onclick="cancelDelete()">Cancelar</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">Concluída</button>
+    </div>
+  </div>
+</div>
+
 <!-- Install banner (iOS) -->
 <div class="install-banner" id="installBanner" style="display:none">
   <p>
@@ -424,6 +486,7 @@ let tasks           = loadTasks();
 let filtroCategoria = 'Todas';
 let calMonth        = new Date().getMonth();
 let selectedCalDay  = null;
+let pendingDeleteId = null;
 
 // ── Time helpers ───────────────────────────────────────────────────────────
 function waitingLabel(criadaEm) {
@@ -547,10 +610,41 @@ function completeTask(id) {
     }, 300);
   }
 }
+
 function deleteTask(id) {
-  tasks = tasks.filter(t => t.id !== id);
-  saveTasks(); render();
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  pendingDeleteId = id;
+  document.getElementById('confirmTaskName').textContent = t.texto;
+  document.getElementById('confirmOverlay').style.display = 'flex';
 }
+
+function confirmDelete() {
+  const id = pendingDeleteId;
+  closeConfirm();
+  if (id !== null) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t.concluida = true; t.concluidaEm = Date.now(); }
+    saveTasks();
+    render();
+  }
+}
+
+function cancelDelete(e) {
+  // fecha se clicar fora da box
+  if (e && e.target !== document.getElementById('confirmOverlay')) return;
+  closeConfirm();
+}
+
+function closeConfirm() {
+  pendingDeleteId = null;
+  document.getElementById('confirmOverlay').style.display = 'none';
+}
+
+// fechar popup com tecla Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && pendingDeleteId !== null) closeConfirm();
+});
 
 // ── SVG icons ──────────────────────────────────────────────────────────────
 function svgCheck(done, small) {
@@ -566,18 +660,15 @@ function svgCheck(done, small) {
 function render() {
   const pending = tasks.filter(t => !t.concluida);
 
-  // Badge
   document.getElementById('badge').textContent = pending.length;
   document.getElementById('subtitle').textContent =
     pending.length === 0 ? 'Tudo em dia!' :
     `${pending.length} tarefa${pending.length > 1 ? 's' : ''} pendente${pending.length > 1 ? 's' : ''}`;
 
-  // Date label
   document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('pt-PT', {
     weekday: 'long', day: 'numeric', month: 'long'
   });
 
-  // Category filters — only from pending tasks
   const catsUsed = [...new Set(pending.map(t => t.categoria))];
   const allCats  = ['Todas', ...CATEGORIAS.filter(c => catsUsed.includes(c))];
   if (!allCats.includes(filtroCategoria)) filtroCategoria = 'Todas';
@@ -586,7 +677,6 @@ function render() {
     `<button class="filter-btn${filtroCategoria === c ? ' active' : ''}" onclick="setCat('${c}')">${c}</button>`
   ).join('');
 
-  // Filtered pending
   const filtered = pending.filter(t =>
     filtroCategoria === 'Todas' ? true : t.categoria === filtroCategoria
   );
@@ -609,9 +699,10 @@ function render() {
             <span class="${cls}">${label}</span>
           </div>
         </div>
-        <button class="btn-delete" onclick="deleteTask(${t.id})">
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-            <path d="M2.5 4h10M6 4V2.5h3V4M5.5 4v8h4V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <button class="btn-delete" onclick="deleteTask(${t.id})" title="Marcar como concluída">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+            <circle cx="8.5" cy="8.5" r="7" stroke="currentColor" stroke-width="1.4"/>
+            <polyline points="5,8.5 7.5,11 12,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
       </div>`;
@@ -639,7 +730,6 @@ function renderCal() {
   const firstDay    = new Date(CAL_ANO, calMonth, 1).getDay();
   const cells = Array(firstDay).fill(null).concat(Array.from({length: daysInMonth}, (_,i) => i+1));
 
-  // Days that have completed tasks
   const doneDays = new Set(
     tasks.filter(t => t.concluida && t.concluidaEm).map(t => {
       const d = new Date(t.concluidaEm);
@@ -651,7 +741,7 @@ function renderCal() {
   const isSelected = d => d && selectedCalDay === d;
   const isToday = d => d && hoje.getFullYear() === CAL_ANO && hoje.getMonth() === calMonth && hoje.getDate() === d;
 
-  const gridCells = cells.map((d, i) => {
+  const gridCells = cells.map((d) => {
     let cls = 'cal-day';
     if (isSelected(d)) cls += ' selected';
     else if (isToday(d)) cls += ' today';
@@ -659,7 +749,6 @@ function renderCal() {
     return `<button class="${cls}" ${!d ? 'disabled' : ''} onclick="selectCalDay(${d})">${d || ''}</button>`;
   }).join('');
 
-  // Done tasks for selected day
   let donePanel = '';
   if (selectedCalDay) {
     const doneTasks = tasks.filter(t => {
@@ -712,7 +801,6 @@ function calNav(dir) { calMonth = Math.max(0, Math.min(11, calMonth + dir)); sel
 function calGoto(m)  { calMonth = m; selectedCalDay = null; renderCal(); }
 function selectCalDay(d) { selectedCalDay = (selectedCalDay === d) ? null : d; renderCal(); }
 
-// Close cal on outside click
 document.addEventListener('mousedown', e => {
   const wrap = document.getElementById('calWrap');
   if (!wrap.contains(e.target)) document.getElementById('calPopup').style.display = 'none';
@@ -736,10 +824,8 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-// Auto-refresh waiting times every minute
 setInterval(render, 60000);
 
-// ── Init ───────────────────────────────────────────────────────────────────
 render();
 showInstallBanner();
 </script>
