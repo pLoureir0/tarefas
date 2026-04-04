@@ -166,6 +166,12 @@
     }
     .recording-text { font-size: 11px; color: var(--red); font-weight: 500; }
     .error-text { font-size: 12px; color: var(--red); margin-bottom: 10px; }
+    .voice-feedback {
+      font-size: 11px; color: var(--teal); font-weight: 500;
+      margin-bottom: 10px; padding: 6px 10px;
+      background: rgba(42,157,143,0.08); border-radius: 8px;
+      animation: fadeIn 0.2s ease;
+    }
     .form-selects { display: flex; gap: 8px; margin-bottom: 14px; }
     .form-select {
       flex: 1; padding: 7px 28px 7px 10px; border-radius: 8px;
@@ -414,6 +420,7 @@
       <span class="recording-text">A gravar... toque no microfone para parar</span>
     </div>
     <p id="voiceError" class="error-text" style="display:none"></p>
+    <p id="voiceFeedback" class="voice-feedback" style="display:none"></p>
     <div class="form-selects">
       <select class="form-select" id="formCat"></select>
       <select class="form-select" id="formPri"></select>
@@ -535,13 +542,97 @@ function startVoice() {
   recognition.lang = 'pt-PT'; recognition.continuous = false; recognition.interimResults = true;
   recognition.onstart  = () => { recording = true; updateMicUI(); };
   recognition.onresult = e => { document.getElementById('formInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); };
-  recognition.onend    = () => { recording = false; updateMicUI(); };
+  recognition.onend    = () => {
+    recording = false; updateMicUI();
+    const texto = document.getElementById('formInput').value;
+    if (texto) analisarVoz(texto);
+  };
   recognition.onerror  = e => {
     recording = false; updateMicUI();
     if (e.error === 'not-allowed') showVoiceError('Acesso ao microfone negado.');
     else if (e.error !== 'no-speech') showVoiceError('Erro no reconhecimento de voz.');
   };
   recognition.start();
+}
+
+// ── Análise de voz ─────────────────────────────────────────────────────────
+function analisarVoz(texto) {
+  // Padrão: "...regista em <categoria> <prioridade>" no fim da frase
+  // Aceita variações: "regista", "regista em", "em <cat>", "<pri>" isolada no fim
+  const t = texto.trim();
+
+  const catKeys = {
+    'Trabalho': ['trabalho'],
+    'Pessoal':  ['pessoal'],
+    'Casa':     ['casa'],
+    'Estudos':  ['estudos', 'estudo'],
+    'Saúde':    ['saude', 'saúde'],
+    'Lazer':    ['lazer'],
+    'Outros':   ['outros'],
+  };
+  const priKeys = {
+    'alta':  ['alta'],
+    'media': ['media', 'média'],
+    'baixa': ['baixa'],
+  };
+
+  // Constrói regex dinâmica para o final da frase:
+  // "regista [em] [categoria] [prioridade]" — cada parte é opcional mas pelo menos uma tem de existir
+  const catPattern  = Object.values(catKeys).flat().join('|');
+  const priPattern  = Object.values(priKeys).flat().join('|');
+
+  // Tenta apanhar "regista [em] [cat] [pri]" ou "regista [em] [pri]" no fim
+  const re = new RegExp(
+    `\\s+regista(?:\\s+em)?(?:\\s+(${catPattern}))?(?:\\s+(${priPattern}))?\\s*$`, 'i'
+  );
+
+  const match = t.match(re);
+
+  if (!match) {
+    // Nada detetado — mantém texto como está
+    document.getElementById('formInput').value = t;
+    return;
+  }
+
+  // Texto limpo = tudo antes do "regista..."
+  const textoLimpo = t.slice(0, match.index).trim();
+  const catStr = match[1] ? match[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : null;
+  const priStr = match[2] ? match[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : null;
+
+  // Mapear para valores reais
+  let catDetectada = null;
+  if (catStr) {
+    for (const [cat, keys] of Object.entries(catKeys)) {
+      const keysNorm = keys.map(k => k.normalize('NFD').replace(/[\u0300-\u036f]/g,''));
+      if (keysNorm.includes(catStr)) { catDetectada = cat; break; }
+    }
+  }
+
+  let priDetectada = null;
+  if (priStr) {
+    for (const [pri, keys] of Object.entries(priKeys)) {
+      const keysNorm = keys.map(k => k.normalize('NFD').replace(/[\u0300-\u036f]/g,''));
+      if (keysNorm.includes(priStr)) { priDetectada = pri; break; }
+    }
+  }
+
+  // Atualizar campos
+  document.getElementById('formInput').value = textoLimpo || t;
+  if (catDetectada) document.getElementById('formCat').value = catDetectada;
+  if (priDetectada) document.getElementById('formPri').value = priDetectada;
+
+  // Feedback visual
+  if (catDetectada || priDetectada) mostrarFeedbackVoz(catDetectada, priDetectada);
+}
+
+function mostrarFeedbackVoz(cat, pri) {
+  const el = document.getElementById('voiceFeedback');
+  const partes = [];
+  if (cat) partes.push(`📁 ${cat}`);
+  if (pri) partes.push(`⚡ ${PRIORIDADES[pri].label}`);
+  el.textContent = '✓ Detetado: ' + partes.join('  ·  ');
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
 }
 function stopVoice() { if (recognition) recognition.stop(); }
 function updateMicUI() {
