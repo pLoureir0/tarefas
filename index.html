@@ -533,26 +533,65 @@ function dayKey(ts) {
 // ── Voice ──────────────────────────────────────────────────────────────────
 let recording = false;
 let recognition = null;
+let silenceTimer = null;
+let voiceBuffer = '';
 
 function toggleVoice() { if (recording) stopVoice(); else startVoice(); }
+
 function startVoice() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { showVoiceError('O seu navegador não suporta reconhecimento de voz.'); return; }
-  recognition = new SR();
+  voiceBuffer = '';
+  iniciarReconhecimento(SR);
+}
+
+function iniciarReconhecimento(SR) {
+  recognition = new (SR || window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.lang = 'pt-PT'; recognition.continuous = false; recognition.interimResults = true;
-  recognition.onstart  = () => { recording = true; updateMicUI(); };
-  recognition.onresult = e => { document.getElementById('formInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); };
-  recognition.onend    = () => {
-    recording = false; updateMicUI();
-    const texto = document.getElementById('formInput').value;
-    if (texto) analisarVoz(texto);
+
+  recognition.onstart = () => { recording = true; updateMicUI(); };
+
+  recognition.onresult = e => {
+    // Acumula o texto desta sessão com o buffer anterior
+    const parcial = Array.from(e.results).map(r => r[0].transcript).join('');
+    const textoCompleto = (voiceBuffer + ' ' + parcial).trim();
+    document.getElementById('formInput').value = textoCompleto;
+
+    // Reinicia o timer de silêncio a cada palavra nova
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => {
+      // 3s sem falar — para definitivamente
+      stopVoice();
+    }, 3000);
   };
-  recognition.onerror  = e => {
-    recording = false; updateMicUI();
-    if (e.error === 'not-allowed') showVoiceError('Acesso ao microfone negado.');
-    else if (e.error !== 'no-speech') showVoiceError('Erro no reconhecimento de voz.');
+
+  recognition.onend = () => {
+    if (!recording) return; // foi stopVoice() manual — não reinicia
+    // Guarda o que foi dito até agora no buffer
+    const atual = document.getElementById('formInput').value;
+    voiceBuffer = atual;
+    // Reinicia automaticamente para continuar a ouvir
+    try { iniciarReconhecimento(null); } catch(e) {}
   };
+
+  recognition.onerror = e => {
+    if (e.error === 'not-allowed') {
+      recording = false; updateMicUI();
+      showVoiceError('Acesso ao microfone negado.');
+    }
+    // no-speech ou outros — reinicia silenciosamente se ainda estiver a gravar
+  };
+
   recognition.start();
+}
+
+function stopVoice() {
+  clearTimeout(silenceTimer);
+  recording = false;
+  updateMicUI();
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  const texto = document.getElementById('formInput').value;
+  if (texto) analisarVoz(texto);
 }
 
 // ── Análise de voz ─────────────────────────────────────────────────────────
