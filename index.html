@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
@@ -6,6 +7,7 @@
   <title>PaFazer</title>
 
   <!-- PWA -->
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="PaFazeres" />
@@ -249,7 +251,7 @@
 
     .task-item {
       background: var(--surface); border-radius: 12px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: flex-start; gap: 12px;
       border: 1px solid var(--border);
       transition: opacity 0.3s, transform 0.3s;
     }
@@ -259,9 +261,12 @@
 
     .btn-check { flex-shrink: 0; padding: 0; line-height: 0; }
     .task-body { flex: 1; min-width: 0; }
+
+    /* CORRECAO: texto completo, sem corte */
     .task-text {
       font-size: 14px; color: var(--text); font-weight: 450;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      white-space: normal; overflow: visible; word-break: break-word;
+      line-height: 1.4;
     }
 
     .task-bottom { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
@@ -273,7 +278,6 @@
       font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600;
     }
 
-    /* Waiting time badge */
     .wait-badge {
       margin-left: auto;
       font-size: 10px; font-weight: 600; color: var(--muted);
@@ -283,14 +287,14 @@
     .wait-badge.long { color: var(--orange); background: rgba(244,162,97,0.12); }
     .wait-badge.very-long { color: var(--red); background: rgba(230,57,70,0.1); }
 
-    /* Complete button — sempre visível */
     .btn-delete {
       color: var(--muted2); padding: 4px;
       line-height: 0; flex-shrink: 0; transition: color 0.15s;
+      margin-top: 2px;
     }
     .btn-delete:hover { color: var(--teal); }
 
-    /* Popup de confirmação */
+    /* Popup de confirmacao */
     .confirm-overlay {
       position: fixed; inset: 0; z-index: 300;
       background: rgba(0,0,0,0.3);
@@ -318,7 +322,7 @@
     .confirm-task-name {
       font-size: 13px; color: var(--muted);
       text-align: center; margin-bottom: 20px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      white-space: normal; word-break: break-word;
     }
     .confirm-actions { display: flex; gap: 8px; }
     .btn-confirm-delete {
@@ -358,11 +362,13 @@
       h1 { font-size: 30px; }
     }
   </style>
+
 </head>
 <body>
 <div class="container">
 
   <!-- Header -->
+
   <div class="header">
     <div class="header-top">
       <div class="cal-wrap" id="calWrap">
@@ -382,9 +388,11 @@
   </div>
 
   <!-- Category filters -->
+
   <div class="filters-row" id="catFilters"></div>
 
   <!-- Add area -->
+
   <div id="addArea">
     <div class="add-buttons">
       <button class="btn-add" onclick="openForm()">
@@ -402,6 +410,7 @@
   </div>
 
   <!-- Form (hidden by default) -->
+
   <div id="formCard" style="display:none" class="form-card">
     <div class="form-input-row">
       <input class="form-input" id="formInput" placeholder="Descreva a tarefa..."
@@ -432,10 +441,12 @@
   </div>
 
   <!-- Task list -->
+
   <div class="task-list" id="taskList"></div>
 </div>
 
-<!-- Popup de confirmação de apagar -->
+<!-- Popup de confirmacao de apagar -->
+
 <div id="confirmOverlay" class="confirm-overlay" style="display:none" onclick="cancelDelete(event)">
   <div class="confirm-box">
     <div class="confirm-icon">
@@ -444,36 +455,36 @@
         <polyline points="6,10 9,13 14,7" stroke="#2a9d8f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <p class="confirm-title">Marcar como concluída?</p>
+    <p class="confirm-title">Marcar como concluida?</p>
     <p class="confirm-task-name" id="confirmTaskName"></p>
     <div class="confirm-actions">
       <button class="btn-confirm-cancel" onclick="cancelDelete()">Cancelar</button>
-      <button class="btn-confirm-delete" onclick="confirmDelete()">Concluída</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">Concluida</button>
     </div>
   </div>
 </div>
 
 <!-- Install banner (iOS) -->
+
 <div class="install-banner" id="installBanner" style="display:none">
   <p>
     <strong>Instalar no iPhone</strong>
-    Toca em <b>Partilhar</b> → <b>Adicionar ao ecrã inicial</b>
+    Toca em <b>Partilhar</b> e depois <b>Adicionar ao ecra inicial</b>
   </p>
-  <button class="btn-dismiss" onclick="dismissBanner()">×</button>
+  <button class="btn-dismiss" onclick="dismissBanner()">x</button>
 </div>
 
 <script>
 const PRIORIDADES = {
   alta:  { label: 'Alta',  color: '#e63946' },
-  media: { label: 'Média', color: '#f4a261' },
+  media: { label: 'Media', color: '#f4a261' },
   baixa: { label: 'Baixa', color: '#2a9d8f' },
 };
-const CATEGORIAS = ['Pessoal', 'Trabalho','Casa', 'Estudos', 'Saúde','Lazer', 'Outros'];
-const MESES      = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DIAS_SEM   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const CATEGORIAS = ['Pessoal', 'Trabalho','Casa', 'Estudos', 'Saude','Lazer', 'Outros'];
+const MESES      = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEM   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 const CAL_ANO    = 2026;
 
-// ── Storage ────────────────────────────────────────────────────────────────
 function loadTasks() {
   try { return JSON.parse(localStorage.getItem('tarefas')) || defaultTasks(); }
   catch { return defaultTasks(); }
@@ -495,21 +506,17 @@ let calMonth        = new Date().getMonth();
 let selectedCalDay  = null;
 let pendingDeleteId = null;
 
-// ── Time helpers ───────────────────────────────────────────────────────────
 function waitingLabel(criadaEm) {
   const diff = Date.now() - criadaEm;
   const mins  = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days  = Math.floor(diff / 86400000);
-
   if (mins < 1)   return 'agora';
-  if (mins < 60)  return `${mins}m`;
-  if (hours < 24) return `${hours}h`;
-
-  const d = days;
+  if (mins < 60)  return mins + 'm';
+  if (hours < 24) return hours + 'h';
   const h = hours % 24;
-  if (h === 0) return `${d}d`;
-  return `${d}d ${h}h`;
+  if (h === 0) return days + 'd';
+  return days + 'd ' + h + 'h';
 }
 
 function waitingClass(criadaEm) {
@@ -522,15 +529,9 @@ function waitingClass(criadaEm) {
 function fmtDateTime(ts) {
   const d = new Date(ts);
   return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' }) +
-    ' · ' + d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    ' - ' + d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
 }
 
-function dayKey(ts) {
-  const d = new Date(ts);
-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-}
-
-// ── Voice ──────────────────────────────────────────────────────────────────
 let recording = false;
 let recognition = null;
 let silenceTimer = null;
@@ -541,7 +542,7 @@ function toggleVoice() { if (recording) stopVoice(); else startVoice(); }
 
 function startVoice() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { showVoiceError('O seu navegador não suporta reconhecimento de voz.'); return; }
+  if (!SR) { showVoiceError('O seu navegador nao suporta reconhecimento de voz.'); return; }
   voiceBuffer = '';
   voiceStopping = false;
   iniciarReconhecimento();
@@ -558,14 +559,11 @@ function iniciarReconhecimento() {
     const parcial = Array.from(e.results).map(r => r[0].transcript).join('');
     const textoCompleto = (voiceBuffer + ' ' + parcial).trim();
     document.getElementById('formInput').value = textoCompleto;
-
-    // Reinicia o timer de 3s a cada palavra nova
     clearTimeout(silenceTimer);
     silenceTimer = setTimeout(() => stopVoice(), 3000);
   };
 
   recognition.onend = () => {
-    // Só reinicia se NÃO estiver a parar
     if (voiceStopping) {
       recording = false;
       updateMicUI();
@@ -573,7 +571,6 @@ function iniciarReconhecimento() {
       if (texto) analisarVoz(texto);
       return;
     }
-    // Guarda buffer e reinicia para continuar a ouvir
     voiceBuffer = document.getElementById('formInput').value;
     try { iniciarReconhecimento(); } catch(e) {}
   };
@@ -597,86 +594,53 @@ function stopVoice() {
   if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
 }
 
-// ── Análise de voz ─────────────────────────────────────────────────────────
 function analisarVoz(texto) {
-  // Padrão: "...regista em <categoria> <prioridade>" no fim da frase
-  // Aceita variações: "regista", "regista em", "em <cat>", "<pri>" isolada no fim
   const t = texto.trim();
-
   const catKeys = {
-    'Trabalho': ['trabalho'],
-    'Pessoal':  ['pessoal'],
-    'Casa':     ['casa'],
-    'Estudos':  ['estudos', 'estudo'],
-    'Saúde':    ['saude', 'saúde'],
-    'Lazer':    ['lazer'],
-    'Outros':   ['outros'],
+    'Trabalho': ['trabalho'], 'Pessoal': ['pessoal'], 'Casa': ['casa'],
+    'Estudos': ['estudos', 'estudo'], 'Saude': ['saude'], 'Lazer': ['lazer'], 'Outros': ['outros'],
   };
   const priKeys = {
-    'alta':  ['alta'],
-    'media': ['media', 'média'],
-    'baixa': ['baixa'],
+    'alta': ['alta'], 'media': ['media'], 'baixa': ['baixa'],
   };
-
-  // Constrói regex dinâmica para o final da frase:
-  // "regista [em] [categoria] [prioridade]" — cada parte é opcional mas pelo menos uma tem de existir
-  const catPattern  = Object.values(catKeys).flat().join('|');
-  const priPattern  = Object.values(priKeys).flat().join('|');
-
-  // Tenta apanhar "regista [em] [cat] [pri]" ou "regista [em] [pri]" no fim
+  const catPattern = Object.values(catKeys).flat().join('|');
+  const priPattern = Object.values(priKeys).flat().join('|');
   const re = new RegExp(
-    `\\s+regista(?:\\s+em)?(?:\\s+(${catPattern}))?(?:\\s+(${priPattern}))?\\s*$`, 'i'
+    '\\s+regista(?:\\s+em)?(?:\\s+(' + catPattern + '))?(?:\\s+(' + priPattern + '))?\\s*$', 'i'
   );
-
   const match = t.match(re);
-
-  if (!match) {
-    // Nada detetado — mantém texto como está
-    document.getElementById('formInput').value = t;
-    return;
-  }
-
-  // Texto limpo = tudo antes do "regista..."
+  if (!match) { document.getElementById('formInput').value = t; return; }
   const textoLimpo = t.slice(0, match.index).trim();
-  const catStr = match[1] ? match[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : null;
-  const priStr = match[2] ? match[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : null;
-
-  // Mapear para valores reais
+  const catStr = match[1] ? match[1].toLowerCase() : null;
+  const priStr = match[2] ? match[2].toLowerCase() : null;
   let catDetectada = null;
   if (catStr) {
     for (const [cat, keys] of Object.entries(catKeys)) {
-      const keysNorm = keys.map(k => k.normalize('NFD').replace(/[\u0300-\u036f]/g,''));
-      if (keysNorm.includes(catStr)) { catDetectada = cat; break; }
+      if (keys.includes(catStr)) { catDetectada = cat; break; }
     }
   }
-
   let priDetectada = null;
   if (priStr) {
     for (const [pri, keys] of Object.entries(priKeys)) {
-      const keysNorm = keys.map(k => k.normalize('NFD').replace(/[\u0300-\u036f]/g,''));
-      if (keysNorm.includes(priStr)) { priDetectada = pri; break; }
+      if (keys.includes(priStr)) { priDetectada = pri; break; }
     }
   }
-
-  // Atualizar campos
   document.getElementById('formInput').value = textoLimpo || t;
   if (catDetectada) document.getElementById('formCat').value = catDetectada;
   if (priDetectada) document.getElementById('formPri').value = priDetectada;
-
-  // Feedback visual
   if (catDetectada || priDetectada) mostrarFeedbackVoz(catDetectada, priDetectada);
 }
 
 function mostrarFeedbackVoz(cat, pri) {
   const el = document.getElementById('voiceFeedback');
   const partes = [];
-  if (cat) partes.push(`📁 ${cat}`);
-  if (pri) partes.push(`⚡ ${PRIORIDADES[pri].label}`);
-  el.textContent = '✓ Detetado: ' + partes.join('  ·  ');
+  if (cat) partes.push('Categoria: ' + cat);
+  if (pri) partes.push('Prioridade: ' + PRIORIDADES[pri].label);
+  el.textContent = 'Detetado: ' + partes.join(' | ');
   el.style.display = 'block';
   setTimeout(() => { el.style.display = 'none'; }, 3000);
 }
-function stopVoice() { if (recognition) recognition.stop(); }
+
 function updateMicUI() {
   document.getElementById('btnMic').classList.toggle('recording', recording);
   document.getElementById('recStatus').style.display = recording ? 'flex' : 'none';
@@ -687,7 +651,6 @@ function showVoiceError(msg) {
   el.textContent = msg; el.style.display = 'block';
 }
 
-// ── Form ───────────────────────────────────────────────────────────────────
 function openForm() {
   document.getElementById('addArea').style.display = 'none';
   document.getElementById('formCard').style.display = 'block';
@@ -709,37 +672,32 @@ function formKeydown(e) {
 function renderFormSelects() {
   const cat = document.getElementById('formCat');
   const pri = document.getElementById('formPri');
-  cat.innerHTML = CATEGORIAS.map(c => `<option>${c}</option>`).join('');
-  pri.innerHTML = Object.entries(PRIORIDADES).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('');
+  cat.innerHTML = CATEGORIAS.map(c => '<option>' + c + '</option>').join('');
+  pri.innerHTML = Object.entries(PRIORIDADES).map(function(entry) {
+    return '<option value="' + entry[0] + '">' + entry[1].label + '</option>';
+  }).join('');
   cat.value = 'Pessoal'; pri.value = 'media';
 }
 function addTask() {
   const texto = document.getElementById('formInput').value.trim();
   if (!texto) return;
   tasks.unshift({
-    id: Date.now(),
-    texto,
+    id: Date.now(), texto,
     categoria: document.getElementById('formCat').value,
     prioridade: document.getElementById('formPri').value,
-    concluida: false,
-    criadaEm: Date.now(),
-    concluidaEm: null,
+    concluida: false, criadaEm: Date.now(), concluidaEm: null,
   });
-  saveTasks();
-  closeForm();
-  render();
+  saveTasks(); closeForm(); render();
 }
 
-// ── Task actions ───────────────────────────────────────────────────────────
 function completeTask(id) {
-  const el = document.querySelector(`[data-id="${id}"]`);
+  const el = document.querySelector('[data-id="' + id + '"]');
   if (el) {
     el.classList.add('completing');
     setTimeout(() => {
       const t = tasks.find(t => t.id === id);
       if (t) { t.concluida = true; t.concluidaEm = Date.now(); }
-      saveTasks();
-      render();
+      saveTasks(); render();
     }, 300);
   }
 }
@@ -758,13 +716,11 @@ function confirmDelete() {
   if (id !== null) {
     const t = tasks.find(t => t.id === id);
     if (t) { t.concluida = true; t.concluidaEm = Date.now(); }
-    saveTasks();
-    render();
+    saveTasks(); render();
   }
 }
 
 function cancelDelete(e) {
-  // fecha se clicar fora da box
   if (e && e.target !== document.getElementById('confirmOverlay')) return;
   closeConfirm();
 }
@@ -774,29 +730,21 @@ function closeConfirm() {
   document.getElementById('confirmOverlay').style.display = 'none';
 }
 
-// fechar popup com tecla Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && pendingDeleteId !== null) closeConfirm();
 });
 
-// ── SVG icons ──────────────────────────────────────────────────────────────
 function svgCheck(done, small) {
   const s = small ? 14 : 18;
-  return `<svg width="${s}" height="${s}" viewBox="0 0 18 18" fill="none">
-    <circle cx="9" cy="9" r="8" stroke="${done ? 'var(--teal)' : '#c8c8c8'}" stroke-width="1.5"
-      fill="${done ? 'var(--teal)' : 'transparent'}"/>
-    ${done ? '<polyline points="5,9 8,12 13,6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : ''}
-  </svg>`;
+  return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="' + (done ? 'var(--teal)' : '#c8c8c8') + '" stroke-width="1.5" fill="' + (done ? 'var(--teal)' : 'transparent') + '"/>' + (done ? '<polyline points="5,9 8,12 13,6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : '') + '</svg>';
 }
 
-// ── Main render ────────────────────────────────────────────────────────────
 function render() {
   const pending = tasks.filter(t => !t.concluida);
-
   document.getElementById('badge').textContent = pending.length;
   document.getElementById('subtitle').textContent =
     pending.length === 0 ? 'Tudo em dia!' :
-    `${pending.length} tarefa${pending.length > 1 ? 's' : ''} pendente${pending.length > 1 ? 's' : ''}`;
+    pending.length + ' tarefa' + (pending.length > 1 ? 's' : '') + ' pendente' + (pending.length > 1 ? 's' : '');
 
   document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('pt-PT', {
     weekday: 'long', day: 'numeric', month: 'long'
@@ -807,7 +755,7 @@ function render() {
   if (!allCats.includes(filtroCategoria)) filtroCategoria = 'Todas';
 
   document.getElementById('catFilters').innerHTML = allCats.map(c =>
-    `<button class="filter-btn${filtroCategoria === c ? ' active' : ''}" onclick="setCat('${c}')">${c}</button>`
+    '<button class="filter-btn' + (filtroCategoria === c ? ' active' : '') + '" onclick="setCat(\'' + c + '\')">' + c + '</button>'
   ).join('');
 
   const filtered = pending.filter(t =>
@@ -822,22 +770,22 @@ function render() {
       const p = PRIORIDADES[t.prioridade];
       const label = waitingLabel(t.criadaEm);
       const cls   = waitingClass(t.criadaEm);
-      return `<div class="task-item" data-id="${t.id}">
-        <div class="task-body">
-          <p class="task-text">${escHtml(t.texto)}</p>
-          <div class="task-bottom">
-            <span class="tag">${escHtml(t.categoria)}</span>
-            <span class="priority-tag" style="color:${p.color};background:${p.color}18">${p.label}</span>
-            <span class="${cls}">${label}</span>
-          </div>
-        </div>
-        <button class="btn-delete" onclick="deleteTask(${t.id})" title="Marcar como concluída">
-          <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-            <circle cx="8.5" cy="8.5" r="7" stroke="currentColor" stroke-width="1.4"/>
-            <polyline points="5,8.5 7.5,11 12,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>`;
+      return '<div class="task-item" data-id="' + t.id + '">' +
+        '<div class="task-body">' +
+          '<p class="task-text">' + escHtml(t.texto) + '</p>' +
+          '<div class="task-bottom">' +
+            '<span class="tag">' + escHtml(t.categoria) + '</span>' +
+            '<span class="priority-tag" style="color:' + p.color + ';background:' + p.color + '18">' + p.label + '</span>' +
+            '<span class="' + cls + '">' + label + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<button class="btn-delete" onclick="deleteTask(' + t.id + ')" title="Marcar como concluida">' +
+          '<svg width="17" height="17" viewBox="0 0 17 17" fill="none">' +
+            '<circle cx="8.5" cy="8.5" r="7" stroke="currentColor" stroke-width="1.4"/>' +
+            '<polyline points="5,8.5 7.5,11 12,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+        '</button>' +
+      '</div>';
     }).join('');
   }
 }
@@ -847,7 +795,6 @@ function escHtml(s) {
 }
 function setCat(c) { filtroCategoria = c; render(); }
 
-// ── Calendar ───────────────────────────────────────────────────────────────
 function toggleCal() {
   const popup = document.getElementById('calPopup');
   const visible = popup.style.display !== 'none';
@@ -860,7 +807,7 @@ function renderCal() {
   const hoje  = new Date();
   const daysInMonth = new Date(CAL_ANO, calMonth + 1, 0).getDate();
   const firstDay    = new Date(CAL_ANO, calMonth, 1).getDay();
-  const cells = Array(firstDay).fill(null).concat(Array.from({length: daysInMonth}, (_,i) => i+1));
+  const cells = Array(firstDay).fill(null).concat(Array.from({length: daysInMonth}, function(_,i){ return i+1; }));
 
   const doneDays = new Set(
     tasks.filter(t => t.concluida && t.concluidaEm).map(t => {
@@ -870,15 +817,12 @@ function renderCal() {
     }).filter(Boolean)
   );
 
-  const isSelected = d => d && selectedCalDay === d;
-  const isToday = d => d && hoje.getFullYear() === CAL_ANO && hoje.getMonth() === calMonth && hoje.getDate() === d;
-
-  const gridCells = cells.map((d) => {
+  const gridCells = cells.map(function(d) {
     let cls = 'cal-day';
-    if (isSelected(d)) cls += ' selected';
-    else if (isToday(d)) cls += ' today';
+    if (d && selectedCalDay === d) cls += ' selected';
+    else if (d && hoje.getFullYear() === CAL_ANO && hoje.getMonth() === calMonth && hoje.getDate() === d) cls += ' today';
     if (d && doneDays.has(d)) cls += ' has-done';
-    return `<button class="${cls}" ${!d ? 'disabled' : ''} onclick="selectCalDay(${d})">${d || ''}</button>`;
+    return '<button class="' + cls + '" ' + (!d ? 'disabled' : '') + ' onclick="selectCalDay(' + d + ')">' + (d || '') + '</button>';
   }).join('');
 
   let donePanel = '';
@@ -888,57 +832,45 @@ function renderCal() {
       const d = new Date(t.concluidaEm);
       return d.getFullYear() === CAL_ANO && d.getMonth() === calMonth && d.getDate() === selectedCalDay;
     });
-
     const items = doneTasks.length === 0
-      ? `<p class="done-panel-empty">Nenhuma tarefa concluída neste dia.</p>`
-      : doneTasks.map(t => `
-        <div class="done-item">
-          <div class="done-check">${svgCheck(true, true)}</div>
-          <div class="done-body">
-            <p class="done-text">${escHtml(t.texto)}</p>
-            <p class="done-meta">Criada: ${fmtDateTime(t.criadaEm)} · Concluída: ${fmtDateTime(t.concluidaEm)}</p>
-          </div>
-        </div>`).join('');
-
-    donePanel = `<div class="done-panel">
-      <p class="done-panel-title">${selectedCalDay} de ${MESES[calMonth]}</p>
-      ${items}
-    </div>`;
+      ? '<p class="done-panel-empty">Nenhuma tarefa concluida neste dia.</p>'
+      : doneTasks.map(t =>
+        '<div class="done-item"><div class="done-check">' + svgCheck(true, true) + '</div>' +
+        '<div class="done-body"><p class="done-text">' + escHtml(t.texto) + '</p>' +
+        '<p class="done-meta">Criada: ' + fmtDateTime(t.criadaEm) + ' - Concluida: ' + fmtDateTime(t.concluidaEm) + '</p></div></div>'
+      ).join('');
+    donePanel = '<div class="done-panel"><p class="done-panel-title">' + selectedCalDay + ' de ' + MESES[calMonth] + '</p>' + items + '</div>';
   }
 
-  popup.innerHTML = `
-    <div class="cal-header">
-      <button class="cal-nav" ${calMonth===0?'disabled':''} onclick="calNav(-1)">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <span class="cal-month-title">${MESES[calMonth]} ${CAL_ANO}</span>
-      <button class="cal-nav" ${calMonth===11?'disabled':''} onclick="calNav(1)">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-    <div class="cal-grid">
-      ${DIAS_SEM.map(d => `<div class="cal-dow">${d}</div>`).join('')}
-      ${gridCells}
-    </div>
-    <div class="cal-months">
-      <p>Ir para mês</p>
-      <div class="cal-months-grid">
-        ${MESES.map((m,i) => `<button class="cal-month-btn${calMonth===i?' active':''}" onclick="calGoto(${i})">${m.slice(0,3)}</button>`).join('')}
-      </div>
-    </div>
-    ${donePanel}`;
+  popup.innerHTML =
+    '<div class="cal-header">' +
+      '<button class="cal-nav" ' + (calMonth===0?'disabled':'') + ' onclick="calNav(-1)">' +
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</button>' +
+      '<span class="cal-month-title">' + MESES[calMonth] + ' ' + CAL_ANO + '</span>' +
+      '<button class="cal-nav" ' + (calMonth===11?'disabled':'') + ' onclick="calNav(1)">' +
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</button>' +
+    '</div>' +
+    '<div class="cal-grid">' +
+      DIAS_SEM.map(d => '<div class="cal-dow">' + d + '</div>').join('') +
+      gridCells +
+    '</div>' +
+    '<div class="cal-months"><p>Ir para mes</p><div class="cal-months-grid">' +
+      MESES.map(function(m,i){ return '<button class="cal-month-btn' + (calMonth===i?' active':'') + '" onclick="calGoto(' + i + ')">' + m.slice(0,3) + '</button>'; }).join('') +
+    '</div></div>' +
+    donePanel;
 }
 
 function calNav(dir) { calMonth = Math.max(0, Math.min(11, calMonth + dir)); selectedCalDay = null; renderCal(); }
 function calGoto(m)  { calMonth = m; selectedCalDay = null; renderCal(); }
 function selectCalDay(d) { selectedCalDay = (selectedCalDay === d) ? null : d; renderCal(); }
 
-document.addEventListener('mousedown', e => {
+document.addEventListener('mousedown', function(e) {
   const wrap = document.getElementById('calWrap');
   if (!wrap.contains(e.target)) document.getElementById('calPopup').style.display = 'none';
 });
 
-// ── PWA ────────────────────────────────────────────────────────────────────
 function showInstallBanner() {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone = window.navigator.standalone === true;
@@ -953,13 +885,13 @@ function dismissBanner() {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js').catch(function(){});
 }
 
 setInterval(render, 60000);
-
 render();
 showInstallBanner();
 </script>
+
 </body>
 </html>
