@@ -5,176 +5,396 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>PaFazer</title>
+
+  <!-- PWA -->
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="PaFazeres" />
   <meta name="theme-color" content="#f7f6f3" />
   <link rel="manifest" href="manifest.json" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #f7f6f3; --surface: #ffffff; --border: #f0ece4; --border2: #e8e4dc;
-      --text: #1a1a1a; --muted: #999; --muted2: #bbb; --muted3: #aaa;
-      --accent: #1a1a1a; --tag-bg: #f5f3ef; --filter-active-bg: #f0ede8; --filter-active-border: #d6d0c8;
-      --red: #e63946; --orange: #f4a261; --teal: #2a9d8f;
-      --font-body: 'DM Sans', 'Segoe UI', sans-serif; --font-display: 'DM Serif Display', serif;
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --border: #f0ece4;
+      --border2: #e8e4dc;
+      --text: #1a1a1a;
+      --muted: #999;
+      --muted2: #bbb;
+      --muted3: #aaa;
+      --accent: #1a1a1a;
+      --tag-bg: #f5f3ef;
+      --filter-active-bg: #f0ede8;
+      --filter-active-border: #d6d0c8;
+      --red: #e63946;
+      --orange: #f4a261;
+      --teal: #2a9d8f;
+      --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+      --font-display: 'DM Serif Display', serif;
     }
+
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #141412; --surface: #1e1e1b; --border: #2a2a26; --border2: #333330;
-        --text: #f0ede8; --muted: #666; --muted2: #555; --muted3: #666;
-        --accent: #f0ede8; --tag-bg: #252520; --filter-active-bg: #2a2a26; --filter-active-border: #444440;
+        --bg: #141412;
+        --surface: #1e1e1b;
+        --border: #2a2a26;
+        --border2: #333330;
+        --text: #f0ede8;
+        --muted: #666;
+        --muted2: #555;
+        --muted3: #666;
+        --accent: #f0ede8;
+        --tag-bg: #252520;
+        --filter-active-bg: #2a2a26;
+        --filter-active-border: #444440;
       }
     }
+
     html { touch-action: manipulation; }
+
     body {
-      font-family: var(--font-body); background: var(--bg); color: var(--text);
-      min-height: 100vh; min-height: 100dvh; display: flex; justify-content: center;
-      padding: 48px 16px calc(env(safe-area-inset-bottom) + 32px); -webkit-text-size-adjust: 100%;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      padding: 48px 16px calc(env(safe-area-inset-bottom) + 32px);
+      -webkit-text-size-adjust: 100%;
     }
+
     button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
     input, select { font-family: inherit; font-size: 16px; }
+
     .container { width: 100%; max-width: 520px; }
 
-```
-/* Header */
-.header { margin-bottom: 36px; }
-.header-top { display: flex; align-items: flex-end; justify-content: space-between; }
-.date-btn { display: flex; align-items: center; gap: 5px; padding: 4px 0; background: transparent; margin-bottom: 6px; font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s; }
-.date-btn:hover { color: var(--text); }
-h1 { font-family: var(--font-display); font-size: 36px; font-weight: 400; color: var(--text); line-height: 1; }
-.badge { background: var(--accent); color: var(--bg); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; font-family: var(--font-display); flex-shrink: 0; }
-.subtitle { margin-top: 10px; font-size: 13px; color: var(--muted); }
+    /* Header */
+    .header { margin-bottom: 36px; }
+    .header-top { display: flex; align-items: flex-end; justify-content: space-between; }
+    .date-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 0; background: transparent; margin-bottom: 6px;
+      font-size: 12px; color: var(--muted); letter-spacing: 0.08em;
+      text-transform: uppercase; transition: color 0.15s;
+    }
+    .date-btn:hover { color: var(--text); }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 36px; font-weight: 400; color: var(--text); line-height: 1;
+    }
+    .badge {
+      background: var(--accent); color: var(--bg);
+      border-radius: 50%; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 500; font-family: var(--font-display);
+      flex-shrink: 0;
+    }
+    .subtitle { margin-top: 10px; font-size: 13px; color: var(--muted); }
 
-/* Filters */
-.filters-row { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
-.filter-btn { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; background: transparent; color: var(--muted3); border: 1px solid var(--border2); transition: all 0.15s; }
-.filter-btn.active { background: var(--filter-active-bg); color: var(--text); border-color: var(--filter-active-border); }
+    /* Filters */
+    .filters-row { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      background: transparent; color: var(--muted3);
+      border: 1px solid var(--border2); transition: all 0.15s;
+    }
+    .filter-btn.active {
+      background: var(--filter-active-bg); color: var(--text);
+      border-color: var(--filter-active-border);
+    }
 
-/* Form */
-.add-area { margin-bottom: 16px; }
-.add-buttons { display: flex; gap: 8px; }
-.btn-add { flex: 1; padding: 13px; border-radius: 12px; border: 1.5px dashed var(--border2); color: var(--muted3); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
-.btn-add:hover { background: var(--surface); color: var(--text); border-color: var(--text); }
-.btn-mic-quick { width: 52px; border-radius: 12px; border: 1.5px dashed var(--border2); color: var(--muted2); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-.btn-mic-quick:hover { border-color: var(--text); color: var(--text); }
-.form-card { background: var(--surface); border-radius: 14px; padding: 18px; border: 1.5px solid var(--border2); box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: border-color 0.25s, box-shadow 0.25s; margin-bottom: 16px; }
-.form-card.recording { border-color: var(--red); box-shadow: 0 0 0 3px rgba(230,57,70,0.07); }
-.form-card.editing { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(244,162,97,0.08); }
-.edit-label { font-size: 10px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-.form-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.form-input { flex: 1; border: none; outline: none; font-size: 15px; color: var(--text); background: transparent; padding: 0; }
-.form-input::placeholder { color: var(--muted2); }
-.btn-mic { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--tag-bg); color: var(--muted); border: 1.5px solid var(--border2); transition: all 0.2s; }
-.btn-mic.recording { background: #fff0f1; color: var(--red); border-color: var(--red); animation: pulse 1s ease-in-out infinite; }
-.form-due { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border2); background: var(--tag-bg); }
-.form-due label { font-size: 11px; color: var(--muted); font-weight: 500; white-space: nowrap; }
-.form-due input[type="datetime-local"] { flex: 1; border: none; outline: none; background: transparent; font-size: 12px; color: var(--text); font-family: inherit; }
-.form-due-clear { font-size: 18px; color: var(--muted2); padding: 0 2px; line-height: 1; }
-.recording-status { display: flex; align-items: center; gap: 7px; margin-bottom: 12px; padding: 7px 10px; border-radius: 8px; background: #fff5f5; }
-.recording-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: pulse 1s infinite; flex-shrink: 0; }
-.recording-text { font-size: 11px; color: var(--red); font-weight: 500; }
-.error-text { font-size: 12px; color: var(--red); margin-bottom: 10px; }
-.voice-feedback { font-size: 11px; color: var(--teal); font-weight: 500; margin-bottom: 10px; padding: 6px 10px; background: rgba(42,157,143,0.08); border-radius: 8px; }
-.form-selects { display: flex; gap: 8px; margin-bottom: 14px; }
-.form-select { flex: 1; padding: 7px 28px 7px 10px; border-radius: 8px; border: 1px solid var(--border2); font-size: 12px; color: var(--muted); background: var(--tag-bg); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
-.form-actions { display: flex; gap: 8px; }
-.btn-confirm { flex: 1; padding: 9px; border-radius: 8px; background: var(--accent); color: var(--bg); font-size: 13px; font-weight: 500; }
-.btn-cancel { padding: 9px 16px; border-radius: 8px; background: var(--filter-active-bg); color: var(--muted); font-size: 13px; }
+    /* Add form */
+    .add-area { margin-bottom: 16px; }
+    .add-buttons { display: flex; gap: 8px; }
+    .btn-add {
+      flex: 1; padding: 13px; border-radius: 12px;
+      border: 1.5px dashed var(--border2);
+      color: var(--muted3); font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-add:hover { background: var(--surface); color: var(--text); border-color: var(--text); }
+    .btn-mic-quick {
+      width: 52px; border-radius: 12px;
+      border: 1.5px dashed var(--border2); color: var(--muted2);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-mic-quick:hover { border-color: var(--text); color: var(--text); }
 
-/* Calendar */
-.cal-wrap { position: relative; }
-.cal-popup { position: absolute; top: calc(100% + 8px); left: 0; z-index: 100; background: var(--surface); border-radius: 14px; padding: 16px; border: 1px solid var(--border2); box-shadow: 0 8px 32px rgba(0,0,0,0.12); width: 284px; }
-.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.cal-nav { padding: 4px; color: var(--muted); transition: color 0.15s; }
-.cal-nav:hover { color: var(--text); }
-.cal-nav:disabled { color: var(--border2); cursor: default; }
-.cal-month-title { font-size: 13px; font-weight: 600; color: var(--text); }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-dow { text-align: center; font-size: 10px; color: var(--muted2); font-weight: 600; padding: 2px 0; }
-.cal-day { padding: 6px 0; border-radius: 7px; font-size: 12px; text-align: center; background: transparent; color: var(--muted3); transition: background 0.15s; position: relative; }
-.cal-day:hover:not(:disabled) { background: var(--filter-active-bg); }
-.cal-day.today { background: var(--filter-active-bg); color: var(--text); }
-.cal-day.selected { background: var(--accent); color: var(--bg); font-weight: 600; }
-.cal-day.has-done::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--teal); }
-.cal-day.selected.has-done::after { background: var(--bg); opacity: 0.7; }
-.cal-day:disabled { color: transparent; cursor: default; }
-.cal-months { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-.cal-months p { margin-bottom: 6px; font-size: 10px; color: var(--muted2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-.cal-months-grid { display: flex; flex-wrap: wrap; gap: 4px; }
-.cal-month-btn { padding: 3px 7px; border-radius: 6px; font-size: 10px; font-weight: 500; background: var(--tag-bg); color: var(--muted3); transition: all 0.15s; }
-.cal-month-btn.active { background: var(--accent); color: var(--bg); }
-.done-panel { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-.done-panel-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-.done-panel-empty { font-size: 12px; color: var(--muted2); padding: 4px 0; }
-.done-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
-.done-item:last-child { border-bottom: none; }
-.done-check { flex-shrink: 0; margin-top: 1px; }
-.done-body { flex: 1; min-width: 0; }
-.done-text { font-size: 12px; color: var(--text); font-weight: 500; text-decoration: line-through; opacity: 0.6; }
-.done-meta { font-size: 10px; color: var(--muted2); margin-top: 2px; }
+    .form-card {
+      background: var(--surface); border-radius: 14px; padding: 18px;
+      border: 1.5px solid var(--border2);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      transition: border-color 0.25s, box-shadow 0.25s;
+      margin-bottom: 16px;
+    }
+    .form-card.recording {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(230,57,70,0.07);
+    }
+    /* NOVO: estado de edição */
+    .form-card.editing {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(244,162,97,0.08);
+    }
+    /* NOVO: label de edição */
+    .edit-label {
+      font-size: 10px; font-weight: 600; color: var(--orange);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+    }
 
-/* Tasks */
-.task-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-.empty { text-align: center; color: var(--muted2); font-size: 13px; padding: 32px 0; }
-.task-item { background: var(--surface); border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid var(--border); transition: opacity 0.3s, transform 0.3s; }
-.task-item.overdue { border-color: rgba(230,57,70,0.35); background: rgba(230,57,70,0.03); }
-.task-item.due-soon { border-color: rgba(244,162,97,0.45); background: rgba(244,162,97,0.03); }
-.task-item.completing { opacity: 0; transform: translateX(20px); }
-.task-body { flex: 1; min-width: 0; }
-.task-text { font-size: 14px; color: var(--text); font-weight: 450; white-space: normal; word-break: break-word; line-height: 1.4; }
-.task-bottom { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
-.tag { font-size: 10px; background: var(--tag-bg); color: var(--muted); padding: 2px 7px; border-radius: 20px; font-weight: 500; }
-.priority-tag { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; }
-.wait-badge { margin-left: auto; font-size: 10px; font-weight: 600; color: var(--muted); background: var(--tag-bg); padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
-.wait-badge.long { color: var(--orange); background: rgba(244,162,97,0.12); }
-.wait-badge.very-long { color: var(--red); background: rgba(230,57,70,0.1); }
-.due-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
-.due-badge.ok { color: var(--teal); background: rgba(42,157,143,0.1); }
-.due-badge.soon { color: var(--orange); background: rgba(244,162,97,0.15); }
-.due-badge.overdue { color: var(--red); background: rgba(230,57,70,0.12); }
-.task-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; padding-top: 1px; }
-.btn-edit { color: var(--muted2); padding: 3px; line-height: 0; transition: color 0.15s; }
-.btn-edit:hover { color: var(--orange); }
-.btn-done { color: var(--muted2); padding: 3px; line-height: 0; transition: color 0.15s; }
-.btn-done:hover { color: var(--teal); }
+    .form-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .form-input {
+      flex: 1; border: none; outline: none; font-size: 15px;
+      color: var(--text); background: transparent; padding: 0;
+    }
+    .form-input::placeholder { color: var(--muted2); }
+    .btn-mic {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--tag-bg); color: var(--muted);
+      border: 1.5px solid var(--border2); transition: all 0.2s;
+    }
+    .btn-mic.recording {
+      background: #fff0f1; color: var(--red); border-color: var(--red);
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .recording-status {
+      display: flex; align-items: center; gap: 7px; margin-bottom: 12px;
+      padding: 7px 10px; border-radius: 8px; background: #fff5f5;
+    }
+    .recording-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--red);
+      animation: pulse 1s infinite; flex-shrink: 0;
+    }
+    .recording-text { font-size: 11px; color: var(--red); font-weight: 500; }
+    .error-text { font-size: 12px; color: var(--red); margin-bottom: 10px; }
+    .voice-feedback {
+      font-size: 11px; color: var(--teal); font-weight: 500;
+      margin-bottom: 10px; padding: 6px 10px;
+      background: rgba(42,157,143,0.08); border-radius: 8px;
+      animation: fadeIn 0.2s ease;
+    }
+    .form-selects { display: flex; gap: 8px; margin-bottom: 14px; }
+    .form-select {
+      flex: 1; padding: 7px 28px 7px 10px; border-radius: 8px;
+      border: 1px solid var(--border2); font-size: 12px; color: var(--muted);
+      background: var(--tag-bg); cursor: pointer; outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .form-actions { display: flex; gap: 8px; }
+    .btn-confirm {
+      flex: 1; padding: 9px; border-radius: 8px;
+      background: var(--accent); color: var(--bg); font-size: 13px; font-weight: 500;
+    }
+    .btn-cancel {
+      padding: 9px 16px; border-radius: 8px;
+      background: var(--filter-active-bg); color: var(--muted); font-size: 13px;
+    }
 
-/* Confirm */
-.confirm-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; padding: 24px; animation: fadeIn 0.15s ease; }
-.confirm-box { background: var(--surface); border-radius: 16px; padding: 24px 20px 20px; width: 100%; max-width: 300px; border: 1px solid var(--border2); box-shadow: 0 16px 48px rgba(0,0,0,0.18); animation: slideUp 0.15s ease; }
-.confirm-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(42,157,143,0.12); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
-.confirm-title { font-size: 15px; font-weight: 600; color: var(--text); text-align: center; margin-bottom: 6px; }
-.confirm-task-name { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 20px; white-space: normal; word-break: break-word; }
-.confirm-actions { display: flex; gap: 8px; }
-.btn-confirm-ok { flex: 1; padding: 10px; border-radius: 10px; background: var(--teal); color: white; font-size: 13px; font-weight: 600; }
-.btn-confirm-cancel { flex: 1; padding: 10px; border-radius: 10px; background: var(--filter-active-bg); color: var(--muted); font-size: 13px; font-weight: 500; }
+    /* Calendar popup */
+    .cal-wrap { position: relative; }
+    .cal-popup {
+      position: absolute; top: calc(100% + 8px); left: 0; z-index: 100;
+      background: var(--surface); border-radius: 14px; padding: 16px;
+      border: 1px solid var(--border2); box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      width: 284px;
+    }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .cal-nav { padding: 4px; color: var(--muted); transition: color 0.15s; }
+    .cal-nav:hover { color: var(--text); }
+    .cal-nav:disabled { color: var(--border2); cursor: default; }
+    .cal-month-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-dow { text-align: center; font-size: 10px; color: var(--muted2); font-weight: 600; padding: 2px 0; }
+    .cal-day {
+      padding: 6px 0; border-radius: 7px; font-size: 12px; text-align: center;
+      background: transparent; color: var(--muted3); transition: background 0.15s;
+      position: relative;
+    }
+    .cal-day:hover:not(:disabled) { background: var(--filter-active-bg); }
+    .cal-day.today { background: var(--filter-active-bg); color: var(--text); }
+    .cal-day.selected { background: var(--accent); color: var(--bg); font-weight: 600; }
+    .cal-day.has-done::after {
+      content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%; background: var(--teal);
+    }
+    .cal-day.selected.has-done::after { background: var(--bg); opacity: 0.7; }
+    .cal-day:disabled { color: transparent; cursor: default; }
+    .cal-months { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .cal-months p { margin-bottom: 6px; font-size: 10px; color: var(--muted2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .cal-months-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+    .cal-month-btn {
+      padding: 3px 7px; border-radius: 6px; font-size: 10px; font-weight: 500;
+      background: var(--tag-bg); color: var(--muted3); transition: all 0.15s;
+    }
+    .cal-month-btn.active { background: var(--accent); color: var(--bg); }
 
-/* Install banner */
-.install-banner { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 16px); left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); border-radius: 14px; padding: 12px 20px; font-size: 13px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 200; max-width: calc(100vw - 32px); width: 480px; }
-.install-banner p { flex: 1; line-height: 1.4; }
-.install-banner strong { font-weight: 600; display: block; }
-.btn-dismiss { color: var(--muted); font-size: 20px; line-height: 1; padding: 0 4px; }
+    /* Done-day panel */
+    .done-panel { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .done-panel-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .done-panel-empty { font-size: 12px; color: var(--muted2); padding: 4px 0; }
+    .done-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid var(--border);
+    }
+    .done-item:last-child { border-bottom: none; }
+    .done-check { flex-shrink: 0; margin-top: 1px; }
+    .done-body { flex: 1; min-width: 0; }
+    .done-text { font-size: 12px; color: var(--text); font-weight: 500; text-decoration: line-through; opacity: 0.6; }
+    .done-meta { font-size: 10px; color: var(--muted2); margin-top: 2px; }
 
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-@keyframes slideUp { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
-@media (max-width: 480px) { body { padding: 32px 16px calc(env(safe-area-inset-bottom) + 24px); } h1 { font-size: 30px; } }
-```
+    /* Task list */
+    .task-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .empty { text-align: center; color: var(--muted2); font-size: 13px; padding: 32px 0; }
 
+    .task-item {
+      background: var(--surface); border-radius: 12px; padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+      border: 1px solid var(--border);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .task-item.completing {
+      opacity: 0; transform: translateX(20px);
+    }
+
+    .task-body { flex: 1; min-width: 0; }
+    .task-text {
+      font-size: 14px; color: var(--text); font-weight: 450;
+      white-space: normal; overflow: visible; word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .task-bottom { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+    .tag {
+      font-size: 10px; background: var(--tag-bg); color: var(--muted);
+      padding: 2px 7px; border-radius: 20px; font-weight: 500;
+    }
+    .priority-tag {
+      font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600;
+    }
+
+    /* Waiting time badge */
+    .wait-badge {
+      margin-left: auto;
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      background: var(--tag-bg); padding: 2px 8px; border-radius: 20px;
+      letter-spacing: 0.02em; white-space: nowrap; flex-shrink: 0;
+    }
+    .wait-badge.long { color: var(--orange); background: rgba(244,162,97,0.12); }
+    .wait-badge.very-long { color: var(--red); background: rgba(230,57,70,0.1); }
+
+    /* NOVO: botoes de acao na tarefa */
+    .task-actions {
+      display: flex; flex-direction: column; gap: 8px;
+      flex-shrink: 0; padding-top: 1px;
+    }
+    .btn-edit {
+      color: var(--muted2); padding: 3px; line-height: 0; transition: color 0.15s;
+    }
+    .btn-edit:hover { color: var(--orange); }
+    .btn-done {
+      color: var(--muted2); padding: 3px; line-height: 0; transition: color 0.15s;
+    }
+    .btn-done:hover { color: var(--teal); }
+
+    /* Popup de confirmacao */
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.15s ease;
+    }
+    .confirm-box {
+      background: var(--surface); border-radius: 16px; padding: 24px 20px 20px;
+      width: 100%; max-width: 300px;
+      border: 1px solid var(--border2);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+      animation: slideUp 0.15s ease;
+    }
+    .confirm-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(42,157,143,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .confirm-title {
+      font-size: 15px; font-weight: 600; color: var(--text);
+      text-align: center; margin-bottom: 6px;
+    }
+    .confirm-task-name {
+      font-size: 13px; color: var(--muted);
+      text-align: center; margin-bottom: 20px;
+      white-space: normal; word-break: break-word;
+    }
+    .confirm-actions { display: flex; gap: 8px; }
+    .btn-confirm-ok {
+      flex: 1; padding: 10px; border-radius: 10px;
+      background: var(--teal); color: white;
+      font-size: 13px; font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .btn-confirm-ok:hover { opacity: 0.85; }
+    .btn-confirm-cancel {
+      flex: 1; padding: 10px; border-radius: 10px;
+      background: var(--filter-active-bg); color: var(--muted);
+      font-size: 13px; font-weight: 500;
+    }
+
+    /* Install banner */
+    .install-banner {
+      position: fixed; bottom: calc(env(safe-area-inset-bottom) + 16px);
+      left: 50%; transform: translateX(-50%);
+      background: var(--text); color: var(--bg);
+      border-radius: 14px; padding: 12px 20px;
+      font-size: 13px; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 200;
+      max-width: calc(100vw - 32px); width: 480px;
+    }
+    .install-banner p { flex: 1; line-height: 1.4; }
+    .install-banner strong { font-weight: 600; display: block; }
+    .btn-install { background: var(--bg); color: var(--text); padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .btn-dismiss { color: var(--muted); font-size: 20px; line-height: 1; padding: 0 4px; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes slideUp { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+    @media (max-width: 480px) {
+      body { padding: 32px 16px calc(env(safe-area-inset-bottom) + 24px); }
+      h1 { font-size: 30px; }
+    }
   </style>
+
 </head>
 <body>
 <div class="container">
 
+  <!-- Header -->
+
   <div class="header">
     <div class="header-top">
       <div class="cal-wrap" id="calWrap">
-        <button class="date-btn" onclick="toggleCal()">
+        <button class="date-btn" id="dateBtn" onclick="toggleCal()">
           <span id="dateLabel"></span>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
         </button>
         <h1>PaFazeres</h1>
         <div id="calPopup" style="display:none" class="cal-popup"></div>
@@ -184,28 +404,49 @@ h1 { font-family: var(--font-display); font-size: 36px; font-weight: 400; color:
     <p class="subtitle" id="subtitle"></p>
   </div>
 
+  <!-- Category filters -->
+
   <div class="filters-row" id="catFilters"></div>
+
+  <!-- Add area -->
 
   <div id="addArea">
     <div class="add-buttons">
       <button class="btn-add" onclick="openForm()">
         <span style="font-size:18px;line-height:1;margin-bottom:1px">+</span> Nova tarefa
       </button>
-      <button class="btn-mic-quick" onclick="openFormVoice()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="22" x2="15" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <button class="btn-mic-quick" title="Nova tarefa por voz" onclick="openFormVoice()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/>
+          <path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="9" y1="22" x2="15" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
       </button>
     </div>
   </div>
 
+  <!-- Form (hidden by default) -->
+
   <div id="formCard" style="display:none" class="form-card">
+    <!-- NOVO: label de edição -->
     <div id="editLabel" style="display:none" class="edit-label">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
       A editar tarefa
     </div>
     <div class="form-input-row">
-      <input class="form-input" id="formInput" placeholder="Descreva a tarefa..." onkeydown="formKeydown(event)" />
-      <button class="btn-mic" id="btnMic" onclick="toggleVoice()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="22" x2="15" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input class="form-input" id="formInput" placeholder="Descreva a tarefa..."
+        onkeydown="formKeydown(event)" />
+      <button class="btn-mic" id="btnMic" onclick="toggleVoice()" title="Gravar por voz">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/>
+          <path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="9" y1="22" x2="15" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
       </button>
     </div>
     <div id="recStatus" style="display:none" class="recording-status">
@@ -214,12 +455,6 @@ h1 { font-family: var(--font-display); font-size: 36px; font-weight: 400; color:
     </div>
     <p id="voiceError" class="error-text" style="display:none"></p>
     <p id="voiceFeedback" class="voice-feedback" style="display:none"></p>
-    <div class="form-due">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="color:var(--muted);flex-shrink:0"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <label for="formDue">Prazo</label>
-      <input type="datetime-local" id="formDue" />
-      <button class="form-due-clear" onclick="clearDue()">x</button>
-    </div>
     <div class="form-selects">
       <select class="form-select" id="formCat"></select>
       <select class="form-select" id="formPri"></select>
@@ -230,13 +465,20 @@ h1 { font-family: var(--font-display); font-size: 36px; font-weight: 400; color:
     </div>
   </div>
 
-  <div class="task-list" id="taskList"></div>
+  <!-- Task list -->
+
+  <div class="task-list" id="taskList" style="margin-top: 8px;"></div>
 </div>
+
+<!-- Popup de confirmacao de concluir -->
 
 <div id="confirmOverlay" class="confirm-overlay" style="display:none" onclick="cancelConfirm(event)">
   <div class="confirm-box">
     <div class="confirm-icon">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#2a9d8f" stroke-width="1.6" fill="none"/><polyline points="6,10 9,13 14,7" stroke="#2a9d8f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8" stroke="#2a9d8f" stroke-width="1.6" fill="none"/>
+        <polyline points="6,10 9,13 14,7" stroke="#2a9d8f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
     <p class="confirm-title">Marcar como concluida?</p>
     <p class="confirm-task-name" id="confirmTaskName"></p>
@@ -247,181 +489,480 @@ h1 { font-family: var(--font-display); font-size: 36px; font-weight: 400; color:
   </div>
 </div>
 
+<!-- Install banner (iOS) -->
+
 <div class="install-banner" id="installBanner" style="display:none">
-  <p><strong>Instalar no iPhone</strong>Partilhar e Adicionar ao ecra inicial</p>
+  <p>
+    <strong>Instalar no iPhone</strong>
+    Toca em <b>Partilhar</b> e depois <b>Adicionar ao ecra inicial</b>
+  </p>
   <button class="btn-dismiss" onclick="dismissBanner()">x</button>
 </div>
 
 <script>
-const PRIO = { alta:{label:'Alta',color:'#e63946'}, media:{label:'Media',color:'#f4a261'}, baixa:{label:'Baixa',color:'#2a9d8f'} };
-const CATS = ['Pessoal','Trabalho','Casa','Estudos','Saude','Lazer','Outros'];
-const MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DIAS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
-const CAL_ANO = 2026;
+const PRIORIDADES = {
+  alta:  { label: 'Alta',  color: '#e63946' },
+  media: { label: 'Media', color: '#f4a261' },
+  baixa: { label: 'Baixa', color: '#2a9d8f' },
+};
+const CATEGORIAS = ['Pessoal', 'Trabalho','Casa', 'Estudos', 'Saude','Lazer', 'Outros'];
+const MESES      = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEM   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+const CAL_ANO    = 2026;
 
-function loadTasks(){try{return JSON.parse(localStorage.getItem('tarefas'))||dflt();}catch{return dflt();}}
-function dflt(){const n=Date.now();return[{id:1,texto:'Layout SB Vertical',categoria:'Trabalho',prioridade:'alta',concluida:false,criadaEm:n-1000*60*60*25,prazo:null},{id:2,texto:'Nova app',categoria:'Estudos',prioridade:'media',concluida:false,criadaEm:n-1000*60*90,prazo:null}];}
-function save(){localStorage.setItem('tarefas',JSON.stringify(tasks));}
-
-let tasks=loadTasks(), filtroCat='Todas', calMonth=new Date().getMonth(), selDay=null, pendingId=null, editingId=null;
-
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function waitLabel(t){const d=Date.now()-t,m=Math.floor(d/60000),h=Math.floor(d/3600000),dy=Math.floor(d/86400000);if(m<1)return'agora';if(m<60)return m+'m';if(h<24)return h+'h';const r=h%24;return r===0?dy+'d':dy+'d '+r+'h';}
-function waitCls(t){const h=(Date.now()-t)/3600000;return h>=48?'wait-badge very-long':h>=12?'wait-badge long':'wait-badge';}
-function fmtDt(ts){const d=new Date(ts);return d.toLocaleDateString('pt-PT',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});}
-
-function dueBadgeHtml(prazo){
-  if(!prazo)return'';
-  const diff=prazo-Date.now(), h=diff/3600000;
-  const d=new Date(prazo), lbl=d.toLocaleDateString('pt-PT',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
-  if(diff<0)return'<span class="due-badge overdue">Expirou '+lbl+'</span>';
-  if(h<24)return'<span class="due-badge soon">Hoje '+lbl+'</span>';
-  return'<span class="due-badge ok">'+lbl+'</span>';
+// ── Storage ────────────────────────────────────────────────────────────────
+function loadTasks() {
+  try { return JSON.parse(localStorage.getItem('tarefas')) || defaultTasks(); }
+  catch { return defaultTasks(); }
 }
-function itemCls(t){if(!t.prazo)return'task-item';const d=t.prazo-Date.now();return d<0?'task-item overdue':d<86400000?'task-item due-soon':'task-item';}
-
-// Voice
-let rec=false,recog=null,silT=null,vBuf='',vStop=false;
-function toggleVoice(){if(rec)stopVoice();else startVoice();}
-function startVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showVErr('Navegador nao suporta voz.');return;}vBuf='';vStop=false;initRec();}
-function initRec(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR();recog.lang='pt-PT';recog.continuous=false;recog.interimResults=true;
-  recog.onstart=()=>{rec=true;micUI();};
-  recog.onresult=e=>{const p=Array.from(e.results).map(r=>r[0].transcript).join('');document.getElementById('formInput').value=(vBuf+' '+p).trim();clearTimeout(silT);silT=setTimeout(()=>stopVoice(),3000);};
-  recog.onend=()=>{if(vStop){rec=false;micUI();const t=document.getElementById('formInput').value;if(t)analVoz(t);return;}vBuf=document.getElementById('formInput').value;try{initRec();}catch(e){}};
-  recog.onerror=e=>{if(e.error==='not-allowed'){vStop=true;rec=false;micUI();showVErr('Microfone negado.');}};
-  recog.start();
+function defaultTasks() {
+  const now = Date.now();
+  return [
+    { id: 1, texto: 'Layout SB Vertical', categoria: 'Trabalho',  prioridade: 'alta',  concluida: false, criadaEm: now - 1000*60*60*25 },
+    { id: 2, texto: 'Nova app',           categoria: 'Estudos',   prioridade: 'media', concluida: false, criadaEm: now - 1000*60*90 },
+  ];
 }
-function stopVoice(){clearTimeout(silT);vStop=true;rec=false;micUI();if(recog){try{recog.stop();}catch(e){}recog=null;}}
-function analVoz(texto){
-  const t=texto.trim();
-  const cK={'Trabalho':['trabalho'],'Pessoal':['pessoal'],'Casa':['casa'],'Estudos':['estudos','estudo'],'Saude':['saude'],'Lazer':['lazer'],'Outros':['outros']};
-  const pK={'alta':['alta'],'media':['media'],'baixa':['baixa']};
-  const re=new RegExp('\\s+regista(?:\\s+em)?(?:\\s+('+Object.values(cK).flat().join('|')+')?(?:\\s+('+Object.values(pK).flat().join('|')+'))?\\s*$','i');
-  const m=t.match(re);if(!m){document.getElementById('formInput').value=t;return;}
-  const limpo=t.slice(0,m.index).trim();
-  let cd=null,pd=null;
-  if(m[1])for(const[c,ks]of Object.entries(cK)){if(ks.includes(m[1].toLowerCase())){cd=c;break;}}
-  if(m[2])for(const[p,ks]of Object.entries(pK)){if(ks.includes(m[2].toLowerCase())){pd=p;break;}}
-  document.getElementById('formInput').value=limpo||t;
-  if(cd)document.getElementById('formCat').value=cd;
-  if(pd)document.getElementById('formPri').value=pd;
-  if(cd||pd){const el=document.getElementById('voiceFeedback');el.textContent='Detetado: '+(cd?'Cat: '+cd:'')+(cd&&pd?' | ':'')+(pd?'Pri: '+PRIO[pd].label:'');el.style.display='block';setTimeout(()=>{el.style.display='none';},3000);}
+function saveTasks() {
+  localStorage.setItem('tarefas', JSON.stringify(tasks));
 }
-function micUI(){document.getElementById('btnMic').classList.toggle('recording',rec);document.getElementById('recStatus').style.display=rec?'flex':'none';document.getElementById('formCard').classList.toggle('recording',rec);}
-function showVErr(m){const el=document.getElementById('voiceError');el.textContent=m;el.style.display='block';}
 
-// Form
-function openForm(id){
-  editingId=id||null;
-  document.getElementById('addArea').style.display='none';
-  document.getElementById('formCard').style.display='block';
-  document.getElementById('voiceError').style.display='none';
-  document.getElementById('voiceFeedback').style.display='none';
-  document.getElementById('editLabel').style.display=editingId?'flex':'none';
-  document.getElementById('btnSave').textContent=editingId?'Guardar':'Adicionar';
-  document.getElementById('formCard').classList.toggle('editing',!!editingId);
-  // populate selects
-  const cat=document.getElementById('formCat'), pri=document.getElementById('formPri');
-  cat.innerHTML=CATS.map(c=>'<option>'+c+'</option>').join('');
-  pri.innerHTML=Object.entries(PRIO).map(e=>'<option value="'+e[0]+'">'+e[1].label+'</option>').join('');
-  if(editingId){
-    const t=tasks.find(t=>t.id===editingId);
-    if(t){
-      document.getElementById('formInput').value=t.texto;
-      cat.value=t.categoria; pri.value=t.prioridade;
-      if(t.prazo){const d=new Date(t.prazo),p=n=>String(n).padStart(2,'0');document.getElementById('formDue').value=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());}
-      else document.getElementById('formDue').value='';
+let tasks           = loadTasks();
+let filtroCategoria = 'Todas';
+let calMonth        = new Date().getMonth();
+let selectedCalDay  = null;
+let pendingDoneId   = null;
+let editingId       = null; // NOVO
+
+// ── Time helpers ───────────────────────────────────────────────────────────
+function waitingLabel(criadaEm) {
+  const diff = Date.now() - criadaEm;
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 1)   return 'agora';
+  if (mins < 60)  return mins + 'm';
+  if (hours < 24) return hours + 'h';
+  const h = hours % 24;
+  if (h === 0) return days + 'd';
+  return days + 'd ' + h + 'h';
+}
+
+function waitingClass(criadaEm) {
+  const hours = (Date.now() - criadaEm) / 3600000;
+  if (hours >= 48) return 'wait-badge very-long';
+  if (hours >= 12) return 'wait-badge long';
+  return 'wait-badge';
+}
+
+function fmtDateTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' }) +
+    ' - ' + d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ── Voice ──────────────────────────────────────────────────────────────────
+let recording = false;
+let recognition = null;
+let silenceTimer = null;
+let voiceBuffer = '';
+let voiceStopping = false;
+
+function toggleVoice() { if (recording) stopVoice(); else startVoice(); }
+
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showVoiceError('O seu navegador nao suporta reconhecimento de voz.'); return; }
+  voiceBuffer = '';
+  voiceStopping = false;
+  iniciarReconhecimento();
+}
+
+function iniciarReconhecimento() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'pt-PT'; recognition.continuous = false; recognition.interimResults = true;
+
+  recognition.onstart = () => { recording = true; updateMicUI(); };
+
+  recognition.onresult = e => {
+    const parcial = Array.from(e.results).map(r => r[0].transcript).join('');
+    const textoCompleto = (voiceBuffer + ' ' + parcial).trim();
+    document.getElementById('formInput').value = textoCompleto;
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => stopVoice(), 3000);
+  };
+
+  recognition.onend = () => {
+    if (voiceStopping) {
+      recording = false;
+      updateMicUI();
+      const texto = document.getElementById('formInput').value;
+      if (texto) analisarVoz(texto);
+      return;
     }
-  } else {
-    document.getElementById('formInput').value='';
-    document.getElementById('formDue').value='';
-    cat.value='Pessoal'; pri.value='media';
+    voiceBuffer = document.getElementById('formInput').value;
+    try { iniciarReconhecimento(); } catch(e) {}
+  };
+
+  recognition.onerror = e => {
+    if (e.error === 'not-allowed') {
+      voiceStopping = true;
+      recording = false; updateMicUI();
+      showVoiceError('Acesso ao microfone negado.');
+    }
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  clearTimeout(silenceTimer);
+  voiceStopping = true;
+  recording = false;
+  updateMicUI();
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+}
+
+// ── Analise de voz ─────────────────────────────────────────────────────────
+function analisarVoz(texto) {
+  const t = texto.trim();
+  const catKeys = {
+    'Trabalho': ['trabalho'], 'Pessoal': ['pessoal'], 'Casa': ['casa'],
+    'Estudos': ['estudos', 'estudo'], 'Saude': ['saude'], 'Lazer': ['lazer'], 'Outros': ['outros'],
+  };
+  const priKeys = {
+    'alta': ['alta'], 'media': ['media'], 'baixa': ['baixa'],
+  };
+  const catPattern = Object.values(catKeys).flat().join('|');
+  const priPattern = Object.values(priKeys).flat().join('|');
+  const re = new RegExp(
+    '\\s+regista(?:\\s+em)?(?:\\s+(' + catPattern + '))?(?:\\s+(' + priPattern + '))?\\s*$', 'i'
+  );
+  const match = t.match(re);
+  if (!match) { document.getElementById('formInput').value = t; return; }
+  const textoLimpo = t.slice(0, match.index).trim();
+  const catStr = match[1] ? match[1].toLowerCase() : null;
+  const priStr = match[2] ? match[2].toLowerCase() : null;
+  let catDetectada = null;
+  if (catStr) {
+    for (const [cat, keys] of Object.entries(catKeys)) {
+      if (keys.includes(catStr)) { catDetectada = cat; break; }
+    }
   }
+  let priDetectada = null;
+  if (priStr) {
+    for (const [pri, keys] of Object.entries(priKeys)) {
+      if (keys.includes(priStr)) { priDetectada = pri; break; }
+    }
+  }
+  document.getElementById('formInput').value = textoLimpo || t;
+  if (catDetectada) document.getElementById('formCat').value = catDetectada;
+  if (priDetectada) document.getElementById('formPri').value = priDetectada;
+  if (catDetectada || priDetectada) mostrarFeedbackVoz(catDetectada, priDetectada);
+}
+
+function mostrarFeedbackVoz(cat, pri) {
+  const el = document.getElementById('voiceFeedback');
+  const partes = [];
+  if (cat) partes.push('Categoria: ' + cat);
+  if (pri) partes.push('Prioridade: ' + PRIORIDADES[pri].label);
+  el.textContent = 'Detetado: ' + partes.join(' | ');
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+function updateMicUI() {
+  document.getElementById('btnMic').classList.toggle('recording', recording);
+  document.getElementById('recStatus').style.display = recording ? 'flex' : 'none';
+  document.getElementById('formCard').classList.toggle('recording', recording);
+}
+function showVoiceError(msg) {
+  const el = document.getElementById('voiceError');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+// ── Form ───────────────────────────────────────────────────────────────────
+function openForm(id) {
+  editingId = id || null;
+  document.getElementById('addArea').style.display = 'none';
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('formInput').value = '';
+  document.getElementById('voiceError').style.display = 'none';
+  document.getElementById('voiceFeedback').style.display = 'none';
+
+  // NOVO: mostrar/esconder label de edicao e mudar texto do botao
+  document.getElementById('editLabel').style.display = editingId ? 'flex' : 'none';
+  document.getElementById('btnSave').textContent = editingId ? 'Guardar' : 'Adicionar';
+  document.getElementById('formCard').classList.toggle('editing', !!editingId);
+
+  renderFormSelects();
+
+  if (editingId) {
+    // NOVO: preencher form com dados da tarefa a editar
+    const t = tasks.find(t => t.id === editingId);
+    if (t) {
+      document.getElementById('formInput').value = t.texto;
+      document.getElementById('formCat').value = t.categoria;
+      document.getElementById('formPri').value = t.prioridade;
+    }
+  }
+
   document.getElementById('formInput').focus();
 }
-function openFormVoice(){openForm();setTimeout(startVoice,150);}
-function closeForm(){stopVoice();rec=false;micUI();editingId=null;document.getElementById('formCard').style.display='none';document.getElementById('formCard').classList.remove('editing');document.getElementById('addArea').style.display='block';}
-function clearDue(){document.getElementById('formDue').value='';}
-function formKeydown(e){if(e.key==='Enter')saveTask();if(e.key==='Escape')closeForm();}
-function saveTask(){
-  const texto=document.getElementById('formInput').value.trim();if(!texto)return;
-  const dv=document.getElementById('formDue').value, prazo=dv?new Date(dv).getTime():null;
-  const cat=document.getElementById('formCat').value, pri=document.getElementById('formPri').value;
-  if(editingId){const t=tasks.find(t=>t.id===editingId);if(t){t.texto=texto;t.categoria=cat;t.prioridade=pri;t.prazo=prazo;}}
-  else tasks.unshift({id:Date.now(),texto,categoria:cat,prioridade:pri,concluida:false,criadaEm:Date.now(),concluidaEm:null,prazo});
-  save();closeForm();render();
+
+function openFormVoice() { openForm(); setTimeout(startVoice, 150); }
+
+function closeForm() {
+  stopVoice(); recording = false; updateMicUI();
+  editingId = null;
+  document.getElementById('formCard').classList.remove('editing');
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('addArea').style.display = 'block';
 }
 
-// Task actions
-function editTask(id){openForm(id);}
-function doneTask(id){const t=tasks.find(t=>t.id===id);if(!t)return;pendingId=id;document.getElementById('confirmTaskName').textContent=t.texto;document.getElementById('confirmOverlay').style.display='flex';}
-function doConfirm(){const id=pendingId;cancelConfirm();if(id!==null){const t=tasks.find(t=>t.id===id);if(t){t.concluida=true;t.concluidaEm=Date.now();}save();render();}}
-function cancelConfirm(e){if(e&&e.target!==document.getElementById('confirmOverlay'))return;pendingId=null;document.getElementById('confirmOverlay').style.display='none';}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pendingId!==null)cancelConfirm();});
+function formKeydown(e) {
+  if (e.key === 'Enter')  saveTask();
+  if (e.key === 'Escape') closeForm();
+}
 
-function svgChk(done,sm){const s=sm?14:18;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="'+(done?'var(--teal)':'#c8c8c8')+'" stroke-width="1.5" fill="'+(done?'var(--teal)':'transparent')+'"/>'+(done?'<polyline points="5,9 8,12 13,6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' :'')+'</svg>';}
-
-function render(){
-  const pend=tasks.filter(t=>!t.concluida);
-  document.getElementById('badge').textContent=pend.length;
-  document.getElementById('subtitle').textContent=pend.length===0?'Tudo em dia!':pend.length+' tarefa'+(pend.length>1?'s':'')+' pendente'+(pend.length>1?'s':'');
-  document.getElementById('dateLabel').textContent=new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
-  const cu=[...new Set(pend.map(t=>t.categoria))];
-  const ac=['Todas',...CATS.filter(c=>cu.includes(c))];
-  if(!ac.includes(filtroCat))filtroCat='Todas';
-  document.getElementById('catFilters').innerHTML=ac.map(c=>'<button class="filter-btn'+(filtroCat===c?' active':'')+'" onclick="setCat(\''+c+'\')">'+c+'</button>').join('');
-  const filt=pend.filter(t=>filtroCat==='Todas'?true:t.categoria===filtroCat);
-  const list=document.getElementById('taskList');
-  if(!filt.length){list.innerHTML='<p class="empty">Nenhuma tarefa pendente.</p>';return;}
-  list.innerHTML=filt.map(t=>{
-    const p=PRIO[t.prioridade];
-    const badge=t.prazo?dueBadgeHtml(t.prazo):'<span class="'+waitCls(t.criadaEm)+'">'+waitLabel(t.criadaEm)+'</span>';
-    return'<div class="'+itemCls(t)+'" data-id="'+t.id+'">'+
-      '<div class="task-body">'+
-        '<p class="task-text">'+esc(t.texto)+'</p>'+
-        '<div class="task-bottom">'+
-          '<span class="tag">'+esc(t.categoria)+'</span>'+
-          '<span class="priority-tag" style="color:'+p.color+';background:'+p.color+'18">'+p.label+'</span>'+
-          badge+
-        '</div>'+
-      '</div>'+
-      '<div class="task-actions">'+
-        '<button class="btn-edit" onclick="editTask('+t.id+')" title="Editar">'+
-          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'+
-        '</button>'+
-        '<button class="btn-done" onclick="doneTask('+t.id+')" title="Concluir">'+
-          '<svg width="16" height="16" viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="7" stroke="currentColor" stroke-width="1.4"/><polyline points="5,8.5 7.5,11 12,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-        '</button>'+
-      '</div>'+
-    '</div>';
+function renderFormSelects() {
+  const cat = document.getElementById('formCat');
+  const pri = document.getElementById('formPri');
+  cat.innerHTML = CATEGORIAS.map(c => '<option>' + c + '</option>').join('');
+  pri.innerHTML = Object.entries(PRIORIDADES).map(function(entry) {
+    return '<option value="' + entry[0] + '">' + entry[1].label + '</option>';
   }).join('');
+  cat.value = 'Pessoal'; pri.value = 'media';
 }
-function setCat(c){filtroCat=c;render();}
 
-// Calendar
-function toggleCal(){const p=document.getElementById('calPopup'),v=p.style.display!=='none';p.style.display=v?'none':'block';if(!v){selDay=null;renderCal();}}
-function renderCal(){
-  const p=document.getElementById('calPopup'),hoje=new Date();
-  const dim=new Date(CAL_ANO,calMonth+1,0).getDate(),fd=new Date(CAL_ANO,calMonth,1).getDay();
-  const cells=Array(fd).fill(null).concat(Array.from({length:dim},(_,i)=>i+1));
-  const dd=new Set(tasks.filter(t=>t.concluida&&t.concluidaEm).map(t=>{const d=new Date(t.concluidaEm);if(d.getFullYear()===CAL_ANO&&d.getMonth()===calMonth)return d.getDate();return null;}).filter(Boolean));
-  const gc=cells.map(d=>{let c='cal-day';if(d&&selDay===d)c+=' selected';else if(d&&hoje.getFullYear()===CAL_ANO&&hoje.getMonth()===calMonth&&hoje.getDate()===d)c+=' today';if(d&&dd.has(d))c+=' has-done';return'<button class="'+c+'" '+((!d)?'disabled':'')+' onclick="selCalDay('+d+')">'+(d||'')+'</button>';}).join('');
-  let dp='';
-  if(selDay){const dt=tasks.filter(t=>{if(!t.concluida||!t.concluidaEm)return false;const d=new Date(t.concluidaEm);return d.getFullYear()===CAL_ANO&&d.getMonth()===calMonth&&d.getDate()===selDay;});const it=dt.length===0?'<p class="done-panel-empty">Nenhuma concluida neste dia.</p>':dt.map(t=>'<div class="done-item"><div class="done-check">'+svgChk(true,true)+'</div><div class="done-body"><p class="done-text">'+esc(t.texto)+'</p><p class="done-meta">'+fmtDt(t.criadaEm)+' - '+fmtDt(t.concluidaEm)+'</p></div></div>').join('');dp='<div class="done-panel"><p class="done-panel-title">'+selDay+' de '+MESES[calMonth]+'</p>'+it+'</div>';}
-  p.innerHTML='<div class="cal-header"><button class="cal-nav" '+(calMonth===0?'disabled':'')+' onclick="calNav(-1)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="cal-month-title">'+MESES[calMonth]+' '+CAL_ANO+'</span><button class="cal-nav" '+(calMonth===11?'disabled':'')+' onclick="calNav(1)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="cal-grid">'+DIAS.map(d=>'<div class="cal-dow">'+d+'</div>').join('')+gc+'</div><div class="cal-months"><p>Ir para mes</p><div class="cal-months-grid">'+MESES.map((m,i)=>'<button class="cal-month-btn'+(calMonth===i?' active':'')+'" onclick="calGoto('+i+')">'+m.slice(0,3)+'</button>').join('')+'</div></div>'+dp;
+// NOVO: saveTask substitui addTask — trata tanto criar como editar
+function saveTask() {
+  const texto = document.getElementById('formInput').value.trim();
+  if (!texto) return;
+  if (editingId) {
+    // Editar tarefa existente
+    const t = tasks.find(t => t.id === editingId);
+    if (t) {
+      t.texto = texto;
+      t.categoria = document.getElementById('formCat').value;
+      t.prioridade = document.getElementById('formPri').value;
+    }
+  } else {
+    // Criar tarefa nova
+    tasks.unshift({
+      id: Date.now(),
+      texto,
+      categoria: document.getElementById('formCat').value,
+      prioridade: document.getElementById('formPri').value,
+      concluida: false,
+      criadaEm: Date.now(),
+      concluidaEm: null,
+    });
+  }
+  saveTasks();
+  closeForm();
+  render();
 }
-function calNav(d){calMonth=Math.max(0,Math.min(11,calMonth+d));selDay=null;renderCal();}
-function calGoto(m){calMonth=m;selDay=null;renderCal();}
-function selCalDay(d){selDay=(selDay===d)?null:d;renderCal();}
-document.addEventListener('mousedown',e=>{const w=document.getElementById('calWrap');if(!w.contains(e.target))document.getElementById('calPopup').style.display='none';});
 
-function showInstallBanner(){const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent),isS=window.navigator.standalone===true,dis=localStorage.getItem('installDismissed');if(isIOS&&!isS&&!dis)document.getElementById('installBanner').style.display='flex';}
-function dismissBanner(){localStorage.setItem('installDismissed','1');document.getElementById('installBanner').style.display='none';}
-if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-setInterval(render,60000);
-render();showInstallBanner();
+// ── Task actions ───────────────────────────────────────────────────────────
+function editTask(id) {
+  openForm(id); // NOVO
+}
+
+function doneTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  pendingDoneId = id;
+  document.getElementById('confirmTaskName').textContent = t.texto;
+  document.getElementById('confirmOverlay').style.display = 'flex';
+}
+
+function doConfirm() {
+  const id = pendingDoneId;
+  cancelConfirm();
+  if (id !== null) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t.concluida = true; t.concluidaEm = Date.now(); }
+    saveTasks();
+    render();
+  }
+}
+
+function cancelConfirm(e) {
+  if (e && e.target !== document.getElementById('confirmOverlay')) return;
+  pendingDoneId = null;
+  document.getElementById('confirmOverlay').style.display = 'none';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && pendingDoneId !== null) cancelConfirm();
+});
+
+// ── SVG icons ──────────────────────────────────────────────────────────────
+function svgCheck(done, small) {
+  const s = small ? 14 : 18;
+  return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="' + (done ? 'var(--teal)' : '#c8c8c8') + '" stroke-width="1.5" fill="' + (done ? 'var(--teal)' : 'transparent') + '"/>' + (done ? '<polyline points="5,9 8,12 13,6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' : '') + '</svg>';
+}
+
+// ── Main render ────────────────────────────────────────────────────────────
+function render() {
+  const pending = tasks.filter(t => !t.concluida);
+
+  document.getElementById('badge').textContent = pending.length;
+  document.getElementById('subtitle').textContent =
+    pending.length === 0 ? 'Tudo em dia!' :
+    pending.length + ' tarefa' + (pending.length > 1 ? 's' : '') + ' pendente' + (pending.length > 1 ? 's' : '');
+
+  document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('pt-PT', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  const catsUsed = [...new Set(pending.map(t => t.categoria))];
+  const allCats  = ['Todas', ...CATEGORIAS.filter(c => catsUsed.includes(c))];
+  if (!allCats.includes(filtroCategoria)) filtroCategoria = 'Todas';
+
+  document.getElementById('catFilters').innerHTML = allCats.map(c =>
+    '<button class="filter-btn' + (filtroCategoria === c ? ' active' : '') + '" onclick="setCat(\'' + c + '\')">' + c + '</button>'
+  ).join('');
+
+  const filtered = pending.filter(t =>
+    filtroCategoria === 'Todas' ? true : t.categoria === filtroCategoria
+  );
+
+  const list = document.getElementById('taskList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<p class="empty">Nenhuma tarefa pendente.</p>';
+  } else {
+    list.innerHTML = filtered.map(t => {
+      const p = PRIORIDADES[t.prioridade];
+      const label = waitingLabel(t.criadaEm);
+      const cls   = waitingClass(t.criadaEm);
+      return '<div class="task-item" data-id="' + t.id + '">' +
+        '<div class="task-body">' +
+          '<p class="task-text">' + escHtml(t.texto) + '</p>' +
+          '<div class="task-bottom">' +
+            '<span class="tag">' + escHtml(t.categoria) + '</span>' +
+            '<span class="priority-tag" style="color:' + p.color + ';background:' + p.color + '18">' + p.label + '</span>' +
+            '<span class="' + cls + '">' + label + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="task-actions">' +
+          '<button class="btn-edit" onclick="editTask(' + t.id + ')" title="Editar">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
+          '</button>' +
+          '<button class="btn-done" onclick="doneTask(' + t.id + ')" title="Concluir">' +
+            '<svg width="16" height="16" viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="7" stroke="currentColor" stroke-width="1.4"/><polyline points="5,8.5 7.5,11 12,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function setCat(c) { filtroCategoria = c; render(); }
+
+// ── Calendar ───────────────────────────────────────────────────────────────
+function toggleCal() {
+  const popup = document.getElementById('calPopup');
+  const visible = popup.style.display !== 'none';
+  popup.style.display = visible ? 'none' : 'block';
+  if (!visible) { selectedCalDay = null; renderCal(); }
+}
+
+function renderCal() {
+  const popup = document.getElementById('calPopup');
+  const hoje  = new Date();
+  const daysInMonth = new Date(CAL_ANO, calMonth + 1, 0).getDate();
+  const firstDay    = new Date(CAL_ANO, calMonth, 1).getDay();
+  const cells = Array(firstDay).fill(null).concat(Array.from({length: daysInMonth}, function(_,i){ return i+1; }));
+
+  const doneDays = new Set(
+    tasks.filter(t => t.concluida && t.concluidaEm).map(t => {
+      const d = new Date(t.concluidaEm);
+      if (d.getFullYear() === CAL_ANO && d.getMonth() === calMonth) return d.getDate();
+      return null;
+    }).filter(Boolean)
+  );
+
+  const gridCells = cells.map(function(d) {
+    let cls = 'cal-day';
+    if (d && selectedCalDay === d) cls += ' selected';
+    else if (d && hoje.getFullYear() === CAL_ANO && hoje.getMonth() === calMonth && hoje.getDate() === d) cls += ' today';
+    if (d && doneDays.has(d)) cls += ' has-done';
+    return '<button class="' + cls + '" ' + (!d ? 'disabled' : '') + ' onclick="selectCalDay(' + d + ')">' + (d || '') + '</button>';
+  }).join('');
+
+  let donePanel = '';
+  if (selectedCalDay) {
+    const doneTasks = tasks.filter(t => {
+      if (!t.concluida || !t.concluidaEm) return false;
+      const d = new Date(t.concluidaEm);
+      return d.getFullYear() === CAL_ANO && d.getMonth() === calMonth && d.getDate() === selectedCalDay;
+    });
+    const items = doneTasks.length === 0
+      ? '<p class="done-panel-empty">Nenhuma tarefa concluida neste dia.</p>'
+      : doneTasks.map(t =>
+        '<div class="done-item"><div class="done-check">' + svgCheck(true, true) + '</div>' +
+        '<div class="done-body"><p class="done-text">' + escHtml(t.texto) + '</p>' +
+        '<p class="done-meta">Criada: ' + fmtDateTime(t.criadaEm) + ' - Concluida: ' + fmtDateTime(t.concluidaEm) + '</p></div></div>'
+      ).join('');
+    donePanel = '<div class="done-panel"><p class="done-panel-title">' + selectedCalDay + ' de ' + MESES[calMonth] + '</p>' + items + '</div>';
+  }
+
+  popup.innerHTML =
+    '<div class="cal-header">' +
+      '<button class="cal-nav" ' + (calMonth===0?'disabled':'') + ' onclick="calNav(-1)">' +
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</button>' +
+      '<span class="cal-month-title">' + MESES[calMonth] + ' ' + CAL_ANO + '</span>' +
+      '<button class="cal-nav" ' + (calMonth===11?'disabled':'') + ' onclick="calNav(1)">' +
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</button>' +
+    '</div>' +
+    '<div class="cal-grid">' +
+      DIAS_SEM.map(d => '<div class="cal-dow">' + d + '</div>').join('') +
+      gridCells +
+    '</div>' +
+    '<div class="cal-months"><p>Ir para mes</p><div class="cal-months-grid">' +
+      MESES.map(function(m,i){ return '<button class="cal-month-btn' + (calMonth===i?' active':'') + '" onclick="calGoto(' + i + ')">' + m.slice(0,3) + '</button>'; }).join('') +
+    '</div></div>' +
+    donePanel;
+}
+
+function calNav(dir) { calMonth = Math.max(0, Math.min(11, calMonth + dir)); selectedCalDay = null; renderCal(); }
+function calGoto(m)  { calMonth = m; selectedCalDay = null; renderCal(); }
+function selectCalDay(d) { selectedCalDay = (selectedCalDay === d) ? null : d; renderCal(); }
+
+document.addEventListener('mousedown', function(e) {
+  const wrap = document.getElementById('calWrap');
+  if (!wrap.contains(e.target)) document.getElementById('calPopup').style.display = 'none';
+});
+
+// ── PWA ────────────────────────────────────────────────────────────────────
+function showInstallBanner() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  const dismissed = localStorage.getItem('installDismissed');
+  if (isIOS && !isStandalone && !dismissed) {
+    document.getElementById('installBanner').style.display = 'flex';
+  }
+}
+function dismissBanner() {
+  localStorage.setItem('installDismissed', '1');
+  document.getElementById('installBanner').style.display = 'none';
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+
+setInterval(render, 60000);
+
+render();
+showInstallBanner();
 </script>
 
 </body>
